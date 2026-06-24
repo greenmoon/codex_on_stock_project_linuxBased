@@ -7,192 +7,967 @@
   <style>
     :root {
       color-scheme: light;
-      --bg: #f7f8f5;
+      --bg: #f5f7f4;
       --panel: #ffffff;
       --ink: #172026;
-      --muted: #5d6872;
-      --line: #d8ded8;
-      --green: #197a45;
+      --muted: #5f6c72;
+      --line: #d8dfd8;
+      --line-strong: #b9c6ba;
       --blue: #1f66b1;
-      --amber: #b66a00;
+      --green: #197a45;
+      --red: #b92f23;
+      --amber: #a76500;
+      --soft-blue: #d9ecff;
+      --soft-green: #e4f4ea;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
       background: var(--bg);
       color: var(--ink);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
-      line-height: 1.55;
     }
 
     header {
-      border-bottom: 1px solid var(--line);
-      background: var(--panel);
-    }
-
-    main,
-    .bar {
-      width: min(1040px, calc(100% - 32px));
-      margin: 0 auto;
-    }
-
-    .bar {
-      padding: 18px 0;
+      height: 58px;
+      padding: 0 16px;
       display: flex;
+      align-items: center;
       justify-content: space-between;
       gap: 16px;
-      align-items: center;
+      background: var(--panel);
+      border-bottom: 1px solid var(--line);
     }
 
     h1 {
       margin: 0;
-      font-size: 22px;
-      letter-spacing: 0;
-    }
-
-    .tag {
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    main {
-      padding: 32px 0 48px;
-    }
-
-    section {
-      margin: 0 0 28px;
-      padding: 24px;
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 8px;
-    }
-
-    h2 {
-      margin: 0 0 10px;
       font-size: 18px;
       letter-spacing: 0;
     }
 
-    p {
-      margin: 0 0 12px;
+    a { color: var(--blue); font-weight: 650; }
+
+    .version {
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
     }
 
-    ul {
-      margin: 10px 0 0;
-      padding-left: 20px;
+    .app {
+      height: calc(100vh - 58px);
+      display: grid;
+      grid-template-columns: 320px minmax(0, 1fr);
+      min-height: 620px;
     }
 
-    code,
-    pre {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    aside {
+      border-right: 1px solid var(--line);
+      background: var(--panel);
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
     }
 
-    pre {
-      overflow-x: auto;
-      margin: 12px 0 0;
-      padding: 14px;
+    .search {
+      padding: 12px;
+      border-bottom: 1px solid var(--line);
+      display: grid;
+      gap: 8px;
+    }
+
+    input, select, button {
+      height: 36px;
+      border: 1px solid var(--line-strong);
       border-radius: 7px;
-      background: #111820;
-      color: #eef5f1;
+      background: #fff;
+      color: var(--ink);
+      font-size: 14px;
     }
 
-    a {
-      color: var(--blue);
+    input {
+      width: 100%;
+      padding: 0 10px;
+    }
+
+    button {
+      padding: 0 12px;
+      cursor: pointer;
       font-weight: 650;
     }
 
-    .grid {
+    button.primary {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: #fff;
+    }
+
+    .filters {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .stock-list {
+      overflow: auto;
+      padding: 8px;
+    }
+
+    .stock-row {
+      width: 100%;
+      height: auto;
+      min-height: 46px;
+      padding: 7px 9px;
+      margin: 0 0 5px;
+      text-align: left;
+      border: 1px solid transparent;
+      border-radius: 7px;
+      background: transparent;
+      display: block;
+    }
+
+    .stock-row:hover,
+    .stock-row.active {
+      border-color: var(--line-strong);
+      background: #f0f5f1;
+    }
+
+    .row-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      font-weight: 750;
+      font-size: 14px;
+    }
+
+    .row-name {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+
+    main {
+      min-width: 0;
+      overflow: auto;
+      padding: 14px;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .title {
+      min-width: 0;
+      font-size: 21px;
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
+
+    .status {
+      color: var(--muted);
+      font-size: 13px;
+      min-height: 18px;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(110px, 1fr));
+      gap: 8px;
+      margin-bottom: 12px;
     }
 
     .metric {
+      background: var(--panel);
       border: 1px solid var(--line);
       border-radius: 7px;
-      padding: 14px;
-      background: #fbfcfa;
+      padding: 10px;
+      min-height: 70px;
     }
 
     .metric strong {
       display: block;
-      font-size: 13px;
       color: var(--muted);
-      margin-bottom: 4px;
+      font-size: 12px;
+      margin-bottom: 5px;
     }
 
     .metric span {
+      display: block;
       font-size: 18px;
-      font-weight: 700;
+      font-weight: 800;
+      overflow-wrap: anywhere;
     }
 
-    @media (max-width: 720px) {
-      .bar,
-      .grid {
+    .decision-buy span { color: var(--green); }
+    .decision-sell span { color: var(--red); }
+    .decision-wait span { color: var(--amber); }
+
+    .charts {
+      display: grid;
+      gap: 10px;
+    }
+
+    .chart-shell {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+    }
+
+    .chart-label {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    canvas {
+      width: 100%;
+      display: block;
+      border: 1px solid #edf1ed;
+      border-radius: 6px;
+      background: #fff;
+    }
+
+    #priceCanvas { height: 430px; }
+    #volumeCanvas { height: 105px; }
+    #rsiCanvas { height: 90px; }
+    #macdCanvas { height: 105px; }
+
+    .empty {
+      padding: 42px 18px;
+      text-align: center;
+      color: var(--muted);
+      border: 1px dashed var(--line-strong);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    @media (max-width: 880px) {
+      header {
+        height: auto;
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 12px;
+      }
+
+      .app {
+        height: auto;
+        min-height: 0;
         display: block;
       }
 
-      .tag {
-        margin-top: 6px;
+      aside {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
       }
 
-      .metric {
-        margin-top: 10px;
+      .stock-list {
+        max-height: 260px;
       }
+
+      .toolbar {
+        grid-template-columns: 1fr;
+      }
+
+      .summary {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      #priceCanvas { height: 330px; }
     }
   </style>
 </head>
 <body>
   <header>
-    <div class="bar">
-      <div>
-        <h1>codex_on_stock_project_linuxBased</h1>
-        <div class="tag">PyQt5 Taiwan stock monitoring GUI</div>
-      </div>
-      <a href="jb_A411B_stock_AI_v36b.py">View Python source</a>
+    <div>
+      <h1>codex_on_stock_project_linuxBased</h1>
+      <div class="status">Browser version based on jb_A411B_stock_AI_v36b.py</div>
     </div>
+    <div class="version">v36b web / GitHub Pages ready</div>
   </header>
 
-  <main>
-    <section>
-      <h2>Project</h2>
-      <p>This repository publishes the Linux-based stock GUI project built from <code>jb_A411B_stock_AI_v36b.py</code>.</p>
-      <div class="grid">
-        <div class="metric">
-          <strong>Main app</strong>
-          <span>PyQt5 GUI</span>
-        </div>
-        <div class="metric">
-          <strong>Markets</strong>
-          <span>TWSE / TPEX</span>
-        </div>
-        <div class="metric">
-          <strong>Data</strong>
-          <span>Live endpoints</span>
+  <div class="app">
+    <aside>
+      <div class="search">
+        <input id="findInput" type="search" placeholder="Find code / name / market">
+        <div class="filters">
+          <select id="marketFilter" aria-label="Market filter">
+            <option value="ALL">All markets</option>
+            <option value="TWSE">TWSE</option>
+            <option value="TPEX">TPEX</option>
+          </select>
+          <button id="reloadButton" class="primary" type="button">Reload</button>
         </div>
       </div>
-    </section>
+      <div id="stockList" class="stock-list"></div>
+    </aside>
 
-    <section>
-      <h2>Run Locally</h2>
-      <p>The stock tool is a desktop Python app, so the browser page is a project home page rather than the running GUI.</p>
-      <pre><code>python3 -m pip install -r requirements.txt
-python3 jb_A411B_stock_AI_v36b.py</code></pre>
-    </section>
+    <main>
+      <div class="toolbar">
+        <div>
+          <div id="pageTitle" class="title">Select a stock</div>
+          <div id="loadStatus" class="status">Ready</div>
+        </div>
+        <button id="prevButton" type="button">Prev</button>
+        <button id="nextButton" type="button">Next</button>
+      </div>
 
-    <section>
-      <h2>Dependencies</h2>
-      <ul>
-        <li>numpy</li>
-        <li>pandas</li>
-        <li>PyQt5</li>
-        <li>requests</li>
-      </ul>
-    </section>
-  </main>
+      <div id="summary" class="summary"></div>
+
+      <div id="emptyState" class="empty">
+        Choose a stock from the left. The page will fetch recent market data and draw the indicators in the browser.
+      </div>
+
+      <div id="charts" class="charts" hidden>
+        <div class="chart-shell">
+          <div class="chart-label"><span>Price / Bollinger</span><span id="priceHint"></span></div>
+          <canvas id="priceCanvas"></canvas>
+        </div>
+        <div class="chart-shell">
+          <div class="chart-label"><span>Volume</span><span id="volumeHint"></span></div>
+          <canvas id="volumeCanvas"></canvas>
+        </div>
+        <div class="chart-shell">
+          <div class="chart-label"><span>RSI</span><span>30 / 70</span></div>
+          <canvas id="rsiCanvas"></canvas>
+        </div>
+        <div class="chart-shell">
+          <div class="chart-label"><span>MACD</span><span>MACD / Signal / Hist</span></div>
+          <canvas id="macdCanvas"></canvas>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const STOCKS = [
+      { code: "2330", name: "TSMC_台灣積體電路", market: "TWSE" },
+      { code: "2454", name: "聯發科", market: "TWSE" },
+      { code: "2379", name: "RealTek_瑞昱半導體", market: "TWSE" },
+      { code: "6415", name: "Silergy-KY_矽力杰", market: "TWSE" },
+      { code: "2337", name: "旺宏", market: "TWSE" },
+      { code: "3008", name: "大立光", market: "TWSE" },
+      { code: "2345", name: "Accton_智邦", market: "TWSE" },
+      { code: "2382", name: "廣達", market: "TWSE" },
+      { code: "2308", name: "台達電", market: "TWSE" },
+      { code: "2301", name: "光寶科", market: "TWSE" },
+      { code: "3406", name: "Largan_玉晶光", market: "TWSE" },
+      { code: "3017", name: "奇鋐", market: "TWSE" },
+      { code: "2317", name: "HonHai_鴻海精密", market: "TWSE" },
+      { code: "4977", name: "GroupDar-KY_眾達-KY", market: "TPEX" },
+      { code: "3450", name: "LianJun_聯鈞", market: "TWSE" },
+      { code: "2357", name: "華碩", market: "TWSE" },
+      { code: "2344", name: "華邦電", market: "TWSE" },
+      { code: "2376", name: "技嘉", market: "TWSE" },
+      { code: "3555", name: "Dr_wang", market: "TWSE" },
+      { code: "3443", name: "創意", market: "TWSE" },
+      { code: "6531", name: "愛普*(SRAM)", market: "TWSE" },
+      { code: "6695", name: "芯鼎", market: "TWSE" },
+      { code: "3037", name: "欣興（Unimicron)", market: "TWSE" },
+      { code: "8046", name: "南電（Nan Ya PCB)", market: "TWSE" },
+      { code: "3189", name: "景碩（Kinsus)", market: "TWSE" },
+      { code: "2408", name: "南亞科（Nanya Technology)", market: "TWSE" },
+      { code: "6770", name: "力積電", market: "TWSE" },
+      { code: "2912", name: "President 7-11", market: "TWSE" },
+      { code: "6515", name: "CPI_YingWei_穎崴 (CPO->)", market: "TWSE" },
+      { code: "6442", name: "GuangSheng_光聖", market: "TPEX" },
+      { code: "6789", name: "CaiYu_采鈺", market: "TWSE" },
+      { code: "6451", name: "XunXin-KY_訊芯-KY", market: "TPEX" },
+      { code: "2455", name: "AllNew_全新", market: "TWSE" },
+      { code: "4938", name: "和碩", market: "TWSE" },
+      { code: "3231", name: "緯創", market: "TWSE" },
+      { code: "6669", name: "緯穎", market: "TWSE" },
+      { code: "2449", name: "京元電", market: "TWSE" },
+      { code: "2356", name: "英業達", market: "TWSE" },
+      { code: "2353", name: "宏碁", market: "TWSE" },
+      { code: "2324", name: "仁寶", market: "TWSE" },
+      { code: "2395", name: "研華", market: "TWSE" },
+      { code: "2377", name: "微星", market: "TWSE" },
+      { code: "3711", name: "日月光投控", market: "TWSE" },
+      { code: "3515", name: "華擎", market: "TWSE" },
+      { code: "3529", name: "力旺", market: "TPEX" },
+      { code: "5351", name: "鈺創", market: "TPEX" },
+      { code: "3324", name: "TwoHong_雙鴻", market: "TPEX" },
+      { code: "3081", name: "Union Asia", market: "TPEX" },
+      { code: "4971", name: "IET-KY_InP_top", market: "TPEX" },
+      { code: "3163", name: "WaveNoWay", market: "TPEX" },
+      { code: "4979", name: "華星光_middle", market: "TPEX" },
+      { code: "3363", name: "Up Complete", market: "TPEX" },
+      { code: "6488", name: "Universal Wefer", market: "TPEX" },
+      { code: "6735", name: "Madar Tester", market: "TPEX" },
+      { code: "5347", name: "World Advance", market: "TPEX" },
+      { code: "3105", name: "Stable", market: "TPEX" }
+    ];
+
+    const state = {
+      selectedCode: STOCKS[0].code,
+      rows: [],
+      hoverIndex: null
+    };
+
+    const el = {
+      findInput: document.getElementById("findInput"),
+      marketFilter: document.getElementById("marketFilter"),
+      reloadButton: document.getElementById("reloadButton"),
+      stockList: document.getElementById("stockList"),
+      pageTitle: document.getElementById("pageTitle"),
+      loadStatus: document.getElementById("loadStatus"),
+      summary: document.getElementById("summary"),
+      emptyState: document.getElementById("emptyState"),
+      charts: document.getElementById("charts"),
+      priceHint: document.getElementById("priceHint"),
+      volumeHint: document.getElementById("volumeHint"),
+      prevButton: document.getElementById("prevButton"),
+      nextButton: document.getElementById("nextButton"),
+      canvases: {
+        price: document.getElementById("priceCanvas"),
+        volume: document.getElementById("volumeCanvas"),
+        rsi: document.getElementById("rsiCanvas"),
+        macd: document.getElementById("macdCanvas")
+      }
+    };
+
+    function parseNumber(value) {
+      const text = String(value ?? "").replaceAll(",", "").replace("+", "").replace("X", "").trim();
+      if (!text || ["--", "---", "----", "null", "None", "除權息"].includes(text)) return NaN;
+      return Number(text);
+    }
+
+    function rocToDate(text) {
+      const parts = String(text).replaceAll("-", "/").split("/");
+      if (parts.length !== 3) return null;
+      let year = Number(parts[0]);
+      const month = Number(parts[1]);
+      const day = Number(parts[2]);
+      if (!Number.isFinite(year) || !Number.isFinite(month) || !Number.isFinite(day)) return null;
+      if (year < 1911) year += 1911;
+      return `${year.toString().padStart(4, "0")}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    }
+
+    function monthStarts(count) {
+      const today = new Date();
+      const out = [];
+      for (let i = 0; i < count; i += 1) {
+        const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+        out.push(`${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}01`);
+      }
+      return out;
+    }
+
+    async function fetchTwseStock(code) {
+      const rows = [];
+      for (const date of monthStarts(8)) {
+        const url = new URL("https://www.twse.com.tw/exchangeReport/STOCK_DAY");
+        url.search = new URLSearchParams({ response: "json", date, stockNo: code }).toString();
+        const response = await fetch(url);
+        if (!response.ok) continue;
+        const obj = await response.json();
+        if (!Array.isArray(obj.data)) continue;
+        for (const row of obj.data) {
+          rows.push({
+            date: rocToDate(row[0]),
+            open: parseNumber(row[3]),
+            high: parseNumber(row[4]),
+            low: parseNumber(row[5]),
+            close: parseNumber(row[6]),
+            volume: parseNumber(row[1])
+          });
+        }
+      }
+      return normalizeRows(rows).slice(-60);
+    }
+
+    function adToRoc(date) {
+      return `${date.getFullYear() - 1911}/${String(date.getMonth() + 1).padStart(2, "0")}/${String(date.getDate()).padStart(2, "0")}`;
+    }
+
+    function parseTpexObject(obj, fallbackDate) {
+      const fields = obj?.tables?.[0]?.fields || obj?.tables?.[0]?.headers || obj?.fields || obj?.headers || [];
+      const data = obj?.tables?.[0]?.data || obj?.tables?.[0]?.aaData || obj?.aaData || obj?.data || [];
+      if (!Array.isArray(data) || data.length === 0) return [];
+
+      const header = fields.map(String);
+      const findIndex = (words) => header.findIndex((h) => words.some((word) => h.includes(word)));
+      let iDate = findIndex(["資料日期", "日期"]);
+      let iCode = findIndex(["代號", "股票代號", "證券代號"]);
+      let iName = findIndex(["名稱", "股票名稱", "證券名稱"]);
+      let iClose = findIndex(["收盤"]);
+      let iOpen = findIndex(["開盤"]);
+      let iHigh = findIndex(["最高"]);
+      let iLow = findIndex(["最低"]);
+      let iVol = findIndex(["成交股數", "成交仟股", "成交數量"]);
+
+      return data.map((row) => {
+        if (!Array.isArray(row) && typeof row === "object") {
+          const keys = Object.keys(row);
+          const findKey = (words) => keys.find((key) => words.some((word) => key.includes(word)));
+          return {
+            date: rocToDate(row[findKey(["資料日期", "日期"])]) || fallbackDate,
+            code: String(row[findKey(["代號", "股票代號", "證券代號"])] || "").trim(),
+            name: String(row[findKey(["名稱", "股票名稱", "證券名稱"])] || "").trim(),
+            open: parseNumber(row[findKey(["開盤"])]),
+            high: parseNumber(row[findKey(["最高"])]),
+            low: parseNumber(row[findKey(["最低"])]),
+            close: parseNumber(row[findKey(["收盤"])]),
+            volume: parseNumber(row[findKey(["成交股數", "成交仟股", "成交數量"])])
+          };
+        }
+
+        if (!Array.isArray(row)) return null;
+        if (iCode < 0 && row.length >= 9) {
+          iDate = 0; iCode = 1; iName = 2; iClose = 3; iOpen = 5; iHigh = 6; iLow = 7; iVol = 8;
+        }
+        return {
+          date: rocToDate(row[iDate]) || fallbackDate,
+          code: String(row[iCode] || "").trim(),
+          name: String(row[iName] || "").trim(),
+          open: parseNumber(row[iOpen]),
+          high: parseNumber(row[iHigh]),
+          low: parseNumber(row[iLow]),
+          close: parseNumber(row[iClose]),
+          volume: parseNumber(row[iVol])
+        };
+      }).filter(Boolean);
+    }
+
+    async function fetchTpexStock(code) {
+      const rows = [];
+      const today = new Date();
+      for (let offset = 0; offset < 160 && rows.length < 60; offset += 1) {
+        const day = new Date(today);
+        day.setDate(today.getDate() - offset);
+        if (day.getDay() === 0 || day.getDay() === 6) continue;
+        const fallbackDate = day.toISOString().slice(0, 10);
+        const base = "https://www.tpex.org.tw/web/stock/aftertrading/otc_quotes_no1430/stk_wn1430_result.php";
+        const url = new URL(base);
+        url.search = new URLSearchParams({ l: "zh-tw", o: "json", se: "EW", d: adToRoc(day) }).toString();
+        try {
+          const response = await fetch(url);
+          if (!response.ok) continue;
+          const obj = await response.json();
+          const dayRows = parseTpexObject(obj, fallbackDate).filter((row) => row.code === code);
+          rows.push(...dayRows.map(({ code: _code, name: _name, ...row }) => row));
+        } catch (_err) {
+          continue;
+        }
+      }
+      return normalizeRows(rows).slice(-60);
+    }
+
+    function normalizeRows(rows) {
+      const byDate = new Map();
+      for (const row of rows) {
+        if (!row.date || !Number.isFinite(row.close)) continue;
+        const open = Number.isFinite(row.open) ? row.open : row.close;
+        const high = Number.isFinite(row.high) ? row.high : row.close;
+        const low = Number.isFinite(row.low) ? row.low : row.close;
+        const volume = Number.isFinite(row.volume) ? row.volume : 0;
+        byDate.set(row.date, { ...row, open, high, low, volume });
+      }
+      return [...byDate.values()].sort((a, b) => a.date.localeCompare(b.date));
+    }
+
+    function rollingMean(values, end, span) {
+      let sum = 0;
+      let n = 0;
+      for (let i = Math.max(0, end - span + 1); i <= end; i += 1) {
+        if (Number.isFinite(values[i])) {
+          sum += values[i];
+          n += 1;
+        }
+      }
+      return n ? sum / n : NaN;
+    }
+
+    function rollingStd(values, end, span, mean) {
+      let sum = 0;
+      let n = 0;
+      for (let i = Math.max(0, end - span + 1); i <= end; i += 1) {
+        if (Number.isFinite(values[i])) {
+          sum += (values[i] - mean) ** 2;
+          n += 1;
+        }
+      }
+      return n > 1 ? Math.sqrt(sum / (n - 1)) : 0;
+    }
+
+    function ema(values, span) {
+      const k = 2 / (span + 1);
+      const out = [];
+      let prev = values[0] || 0;
+      for (let i = 0; i < values.length; i += 1) {
+        prev = i === 0 ? values[i] : values[i] * k + prev * (1 - k);
+        out.push(prev);
+      }
+      return out;
+    }
+
+    function addIndicators(rows) {
+      const close = rows.map((row) => row.close);
+      const ema12 = ema(close, 12);
+      const ema26 = ema(close, 26);
+      const macd = close.map((_, i) => ema12[i] - ema26[i]);
+      const signal = ema(macd, 9);
+
+      return rows.map((row, i) => {
+        const ma20 = rollingMean(close, i, 20);
+        const std20 = rollingStd(close, i, 20, ma20);
+        const gains = [];
+        const losses = [];
+        for (let j = Math.max(1, i - 13); j <= i; j += 1) {
+          const delta = close[j] - close[j - 1];
+          gains.push(Math.max(0, delta));
+          losses.push(Math.max(0, -delta));
+        }
+        const avgGain = gains.reduce((a, b) => a + b, 0) / Math.max(1, gains.length);
+        const avgLoss = losses.reduce((a, b) => a + b, 0) / Math.max(1, losses.length);
+        const rsi = avgLoss === 0 ? 100 : 100 - 100 / (1 + avgGain / avgLoss);
+        const prevMacd = i > 0 ? macd[i - 1] : macd[i];
+        const prevSignal = i > 0 ? signal[i - 1] : signal[i];
+        return {
+          ...row,
+          ma20,
+          std20,
+          bbu: ma20 + 2 * std20,
+          bbl: ma20 - 2 * std20,
+          bbu12: ma20 + 1.2 * std20,
+          bbl12: ma20 - 1.2 * std20,
+          rsi,
+          macd: macd[i],
+          signal: signal[i],
+          hist: macd[i] - signal[i],
+          macdGolden: prevMacd <= prevSignal && macd[i] > signal[i],
+          macdDeath: prevMacd >= prevSignal && macd[i] < signal[i]
+        };
+      });
+    }
+
+    function judge(row, market) {
+      if (market === "TPEX") {
+        if (row.macdGolden && row.rsi < 65) return "BUY";
+        if (row.macdDeath && row.rsi > 35) return "SELL";
+        return "WAIT";
+      }
+      if (row.macdGolden && row.rsi < 70) return "BUY";
+      if (row.macdDeath && row.rsi > 30) return "SELL";
+      return "WAIT";
+    }
+
+    function visibleStocks() {
+      const text = el.findInput.value.trim().toLowerCase();
+      const market = el.marketFilter.value;
+      return STOCKS.filter((stock) => {
+        const hay = `${stock.code} ${stock.name} ${stock.market}`.toLowerCase();
+        return (market === "ALL" || stock.market === market) && (!text || hay.includes(text));
+      });
+    }
+
+    function renderStockList() {
+      const list = visibleStocks();
+      el.stockList.innerHTML = "";
+      for (const stock of list) {
+        const button = document.createElement("button");
+        button.className = `stock-row${stock.code === state.selectedCode ? " active" : ""}`;
+        button.type = "button";
+        button.innerHTML = `<div class="row-top"><span>${stock.code}</span><span>${stock.market}</span></div><div class="row-name">${stock.name}</div>`;
+        button.addEventListener("click", () => selectStock(stock.code));
+        el.stockList.appendChild(button);
+      }
+      if (!list.some((stock) => stock.code === state.selectedCode) && list[0]) {
+        state.selectedCode = list[0].code;
+      }
+    }
+
+    function formatNumber(value, digits = 2) {
+      if (!Number.isFinite(value)) return "-";
+      return value.toLocaleString(undefined, { maximumFractionDigits: digits, minimumFractionDigits: digits });
+    }
+
+    function metric(label, value, extraClass = "") {
+      return `<div class="metric ${extraClass}"><strong>${label}</strong><span>${value}</span></div>`;
+    }
+
+    function renderSummary(stock, rows) {
+      const last = rows.at(-1);
+      const decision = judge(last, stock.market);
+      const cls = decision === "BUY" ? "decision-buy" : decision === "SELL" ? "decision-sell" : "decision-wait";
+      el.summary.innerHTML = [
+        metric("Date", last.date),
+        metric("Close", formatNumber(last.close)),
+        metric("RSI", formatNumber(last.rsi, 1)),
+        metric("MACD", `${formatNumber(last.macd)} / ${formatNumber(last.signal)}`),
+        metric("Market", stock.market),
+        metric("Decision", decision, cls)
+      ].join("");
+    }
+
+    function setupCanvas(canvas) {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = Math.max(300, Math.floor(rect.width * dpr));
+      canvas.height = Math.max(80, Math.floor(rect.height * dpr));
+      const ctx = canvas.getContext("2d");
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      return { ctx, width: canvas.width / dpr, height: canvas.height / dpr, pad: 32 };
+    }
+
+    function range(values, padRatio = 0.08) {
+      const clean = values.filter(Number.isFinite);
+      let min = Math.min(...clean);
+      let max = Math.max(...clean);
+      if (!clean.length) return [0, 1];
+      if (min === max) {
+        min -= 1;
+        max += 1;
+      }
+      const pad = (max - min) * padRatio;
+      return [min - pad, max + pad];
+    }
+
+    function xFor(i, n, width, pad) {
+      return pad + i * ((width - 2 * pad) / Math.max(1, n - 1));
+    }
+
+    function yFor(value, min, max, height, pad) {
+      return pad + (max - value) / (max - min || 1) * (height - 2 * pad);
+    }
+
+    function drawGrid(ctx, width, height, pad) {
+      ctx.clearRect(0, 0, width, height);
+      ctx.strokeStyle = "#e8eee8";
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 4; i += 1) {
+        const y = pad + i * ((height - 2 * pad) / 4);
+        ctx.beginPath();
+        ctx.moveTo(pad, y);
+        ctx.lineTo(width - pad, y);
+        ctx.stroke();
+      }
+    }
+
+    function drawLine(ctx, rows, field, min, max, width, height, pad, color, lineWidth = 2) {
+      ctx.strokeStyle = color;
+      ctx.lineWidth = lineWidth;
+      ctx.beginPath();
+      rows.forEach((row, i) => {
+        const x = xFor(i, rows.length, width, pad);
+        const y = yFor(row[field], min, max, height, pad);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+    }
+
+    function drawBand(ctx, rows, topField, bottomField, min, max, width, height, pad, color) {
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      rows.forEach((row, i) => {
+        const x = xFor(i, rows.length, width, pad);
+        const y = yFor(row[topField], min, max, height, pad);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      [...rows].reverse().forEach((row, reverseIndex) => {
+        const i = rows.length - 1 - reverseIndex;
+        ctx.lineTo(xFor(i, rows.length, width, pad), yFor(row[bottomField], min, max, height, pad));
+      });
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    function drawAxisLabels(ctx, labels, width, height, pad) {
+      ctx.fillStyle = "#5f6c72";
+      ctx.font = "12px ui-monospace, Menlo, Consolas, monospace";
+      labels.forEach(([text, y]) => ctx.fillText(text, 5, y));
+      ctx.strokeStyle = "#cbd5ca";
+      ctx.strokeRect(pad, pad, width - 2 * pad, height - 2 * pad);
+    }
+
+    function drawPrice(rows) {
+      const { ctx, width, height, pad } = setupCanvas(el.canvases.price);
+      const [min, max] = range(rows.flatMap((row) => [row.bbl, row.close, row.bbu]));
+      drawGrid(ctx, width, height, pad);
+      drawBand(ctx, rows, "bbu", "bbl", min, max, width, height, pad, "rgba(93, 162, 219, 0.18)");
+      drawBand(ctx, rows, "bbu12", "bbl12", min, max, width, height, pad, "rgba(93, 162, 219, 0.28)");
+      drawLine(ctx, rows, "ma20", min, max, width, height, pad, "#d87900", 2);
+      drawLine(ctx, rows, "close", min, max, width, height, pad, "#101820", 2);
+      drawAxisLabels(ctx, [[max.toFixed(0), 18], [((max + min) / 2).toFixed(0), height / 2], [min.toFixed(0), height - 10]], width, height, pad);
+      drawCursor(ctx, rows, min, max, width, height, pad);
+    }
+
+    function drawVolume(rows) {
+      const { ctx, width, height, pad } = setupCanvas(el.canvases.volume);
+      const max = Math.max(1, ...rows.map((row) => row.volume));
+      drawGrid(ctx, width, height, pad);
+      const barWidth = Math.max(2, (width - 2 * pad) / rows.length * 0.55);
+      ctx.fillStyle = "#8b9490";
+      rows.forEach((row, i) => {
+        const x = xFor(i, rows.length, width, pad) - barWidth / 2;
+        const h = row.volume / max * (height - 2 * pad);
+        ctx.fillRect(x, height - pad - h, barWidth, h);
+      });
+      drawAxisLabels(ctx, [[max.toFixed(0), 18], [(max / 2).toFixed(0), height / 2], ["0", height - 10]], width, height, pad);
+    }
+
+    function drawRsi(rows) {
+      const { ctx, width, height, pad } = setupCanvas(el.canvases.rsi);
+      drawGrid(ctx, width, height, pad);
+      ctx.strokeStyle = "#b8c0b8";
+      ctx.setLineDash([5, 4]);
+      [30, 70].forEach((level) => {
+        const y = yFor(level, 0, 100, height, pad);
+        ctx.beginPath();
+        ctx.moveTo(pad, y);
+        ctx.lineTo(width - pad, y);
+        ctx.stroke();
+      });
+      ctx.setLineDash([]);
+      drawLine(ctx, rows, "rsi", 0, 100, width, height, pad, "#1f66b1", 2);
+      drawAxisLabels(ctx, [["70", 18], ["50", height / 2], ["30", height - 10]], width, height, pad);
+    }
+
+    function drawMacd(rows) {
+      const { ctx, width, height, pad } = setupCanvas(el.canvases.macd);
+      const maxAbs = Math.max(1, ...rows.flatMap((row) => [Math.abs(row.macd), Math.abs(row.signal), Math.abs(row.hist)]));
+      drawGrid(ctx, width, height, pad);
+      const barWidth = Math.max(2, (width - 2 * pad) / rows.length * 0.45);
+      rows.forEach((row, i) => {
+        const y0 = yFor(0, -maxAbs, maxAbs, height, pad);
+        const y1 = yFor(row.hist, -maxAbs, maxAbs, height, pad);
+        ctx.fillStyle = row.hist >= 0 ? "#2d8a51" : "#c94636";
+        ctx.fillRect(xFor(i, rows.length, width, pad) - barWidth / 2, Math.min(y0, y1), barWidth, Math.abs(y1 - y0));
+      });
+      drawLine(ctx, rows, "macd", -maxAbs, maxAbs, width, height, pad, "#1f66b1", 2);
+      drawLine(ctx, rows, "signal", -maxAbs, maxAbs, width, height, pad, "#d87900", 2);
+      drawAxisLabels(ctx, [[maxAbs.toFixed(2), 18], ["0", height / 2], [(-maxAbs).toFixed(2), height - 10]], width, height, pad);
+    }
+
+    function drawCursor(ctx, rows, min, max, width, height, pad) {
+      const i = state.hoverIndex ?? rows.length - 1;
+      const row = rows[i];
+      if (!row) return;
+      const x = xFor(i, rows.length, width, pad);
+      const y = yFor(row.close, min, max, height, pad);
+      ctx.strokeStyle = "#d13224";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(x, pad);
+      ctx.lineTo(x, height - pad);
+      ctx.stroke();
+      ctx.fillStyle = "#d13224";
+      ctx.beginPath();
+      ctx.arc(x, y, 4, 0, Math.PI * 2);
+      ctx.fill();
+      const sigma = row.std20 > 0 ? (row.close - row.ma20) / row.std20 : 0;
+      const text = `${row.date}  Close ${formatNumber(row.close)}  sigma ${sigma >= 0 ? "+" : ""}${sigma.toFixed(2)}`;
+      ctx.font = "13px ui-monospace, Menlo, Consolas, monospace";
+      const textWidth = ctx.measureText(text).width + 12;
+      const boxX = Math.min(Math.max(pad + 4, x + 8), width - pad - textWidth);
+      ctx.fillStyle = "rgba(255,255,255,0.92)";
+      ctx.fillRect(boxX, pad + 8, textWidth, 26);
+      ctx.strokeStyle = "#d13224";
+      ctx.strokeRect(boxX, pad + 8, textWidth, 26);
+      ctx.fillStyle = "#172026";
+      ctx.fillText(text, boxX + 6, pad + 26);
+      el.priceHint.textContent = text;
+      el.volumeHint.textContent = `${rows.length} trading rows`;
+    }
+
+    function drawCharts(rows) {
+      drawPrice(rows);
+      drawVolume(rows);
+      drawRsi(rows);
+      drawMacd(rows);
+    }
+
+    async function selectStock(code, forceReload = false) {
+      const stock = STOCKS.find((item) => item.code === code) || STOCKS[0];
+      state.selectedCode = stock.code;
+      state.hoverIndex = null;
+      renderStockList();
+      el.pageTitle.textContent = `${stock.code}.${stock.market}  ${stock.name}`;
+      el.loadStatus.textContent = `Loading ${stock.market} ${stock.code}...`;
+      el.emptyState.hidden = true;
+      el.charts.hidden = false;
+
+      try {
+        if (!stock.rows || forceReload) {
+          const rawRows = stock.market === "TPEX" ? await fetchTpexStock(stock.code) : await fetchTwseStock(stock.code);
+          if (rawRows.length < 2) throw new Error("No market data returned. This endpoint may block browser access.");
+          stock.rows = addIndicators(rawRows).slice(-60);
+        }
+        state.rows = stock.rows;
+        renderSummary(stock, stock.rows);
+        drawCharts(stock.rows);
+        el.loadStatus.textContent = `Ready - ${stock.rows.at(-1).date}`;
+      } catch (err) {
+        el.summary.innerHTML = "";
+        el.charts.hidden = true;
+        el.emptyState.hidden = false;
+        el.emptyState.textContent = `${stock.code} ${stock.name}: ${err.message}`;
+        el.loadStatus.textContent = "Load failed";
+      }
+    }
+
+    function moveSelection(step) {
+      const list = visibleStocks();
+      const current = list.findIndex((stock) => stock.code === state.selectedCode);
+      const next = list[Math.min(list.length - 1, Math.max(0, current + step))];
+      if (next) selectStock(next.code);
+    }
+
+    for (const canvas of Object.values(el.canvases)) {
+      canvas.addEventListener("mousemove", (event) => {
+        if (!state.rows.length) return;
+        const rect = el.canvases.price.getBoundingClientRect();
+        const pad = 32;
+        const x = Math.min(Math.max(event.clientX - rect.left, pad), rect.width - pad);
+        const raw = (x - pad) / Math.max(1, rect.width - 2 * pad) * (state.rows.length - 1);
+        state.hoverIndex = Math.round(raw);
+        drawCharts(state.rows);
+      });
+      canvas.addEventListener("mouseleave", () => {
+        state.hoverIndex = null;
+        if (state.rows.length) drawCharts(state.rows);
+      });
+    }
+
+    el.findInput.addEventListener("input", renderStockList);
+    el.marketFilter.addEventListener("change", () => {
+      renderStockList();
+      const first = visibleStocks()[0];
+      if (first) selectStock(first.code);
+    });
+    el.reloadButton.addEventListener("click", () => selectStock(state.selectedCode, true));
+    el.prevButton.addEventListener("click", () => moveSelection(-1));
+    el.nextButton.addEventListener("click", () => moveSelection(1));
+    window.addEventListener("resize", () => state.rows.length && drawCharts(state.rows));
+    window.addEventListener("keydown", (event) => {
+      if (event.target.matches("input, select")) return;
+      if (event.code === "Space" || event.code === "ArrowDown") {
+        event.preventDefault();
+        moveSelection(1);
+      } else if (["KeyC", "KeyV", "KeyB", "KeyN", "KeyM", "ArrowUp"].includes(event.code)) {
+        event.preventDefault();
+        moveSelection(-1);
+      } else if (event.key === "/") {
+        event.preventDefault();
+        el.findInput.focus();
+        el.findInput.select();
+      }
+    });
+
+    renderStockList();
+    selectStock(state.selectedCode);
+  </script>
 </body>
 </html>
