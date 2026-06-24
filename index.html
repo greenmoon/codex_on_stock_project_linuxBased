@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>codex_on_stock_project_linuxBased</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f7f8f5;
+      --panel: #ffffff;
+      --ink: #172026;
+      --muted: #5d6872;
+      --line: #d8ded8;
+      --green: #197a45;
+      --blue: #1f66b1;
+      --amber: #b66a00;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      line-height: 1.55;
+    }
+
+    header {
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    main,
+    .bar {
+      width: min(1040px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .bar {
+      padding: 18px 0;
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: 0;
+    }
+
+    .tag {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    main {
+      padding: 32px 0 48px;
+    }
+
+    section {
+      margin: 0 0 28px;
+      padding: 24px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    h2 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    p {
+      margin: 0 0 12px;
+    }
+
+    ul {
+      margin: 10px 0 0;
+      padding-left: 20px;
+    }
+
+    code,
+    pre {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    pre {
+      overflow-x: auto;
+      margin: 12px 0 0;
+      padding: 14px;
+      border-radius: 7px;
+      background: #111820;
+      color: #eef5f1;
+    }
+
+    a {
+      color: var(--blue);
+      font-weight: 650;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      padding: 14px;
+      background: #fbfcfa;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .metric span {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    @media (max-width: 720px) {
+      .bar,
+      .grid {
+        display: block;
+      }
+
+      .tag {
+        margin-top: 6px;
+      }
+
+      .metric {
+        margin-top: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="bar">
+      <div>
+        <h1>codex_on_stock_project_linuxBased</h1>
+        <div class="tag">PyQt5 Taiwan stock monitoring GUI</div>
+      </div>
+      <a href="jb_A411B_stock_AI_v36b.py">View Python source</a>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <h2>Project</h2>
+      <p>This repository publishes the Linux-based stock GUI project built from <code>jb_A411B_stock_AI_v36b.py</code>.</p>
+      <div class="grid">
+        <div class="metric">
+          <strong>Main app</strong>
+          <span>PyQt5 GUI</span>
+        </div>
+        <div class="metric">
+          <strong>Markets</strong>
+          <span>TWSE / TPEX</span>
+        </div>
+        <div class="metric">
+          <strong>Data</strong>
+          <span>Live endpoints</span>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Run Locally</h2>
+      <p>The stock tool is a desktop Python app, so the browser page is a project home page rather than the running GUI.</p>
+      <pre><code>python3 -m pip install -r requirements.txt
+python3 jb_A411B_stock_AI_v36b.py</code></pre>
+    </section>
+
+    <section>
+      <h2>Dependencies</h2>
+      <ul>
+        <li>numpy</li>
+        <li>pandas</li>
+        <li>PyQt5</li>
+        <li>requests</li>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>
