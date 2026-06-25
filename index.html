@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>codex_on_stock_project_linuxBased_V01_2026.06.25_2211</title>
+  <title>codex_on_stock_project_linuxBased V02 2026.06.25 22:43</title>
   <style>
     :root {
       color-scheme: light;
@@ -413,7 +413,7 @@
 <body>
   <header>
     <div>
-      <h1>codex_on_stock_project_linuxBased_V01_2026.06.25_2211</h1>
+      <h1>codex_on_stock_project_linuxBased V02 2026.06.25 22:43</h1>
       <div class="status">Browser version based on jb_A411B_stock_AI_v36b.py</div>
     </div>
     <div class="mode-buttons" aria-label="Layout mode">
@@ -582,6 +582,18 @@
       if (state.rows.length) {
         requestAnimationFrame(() => drawCharts(state.rows));
       }
+    }
+
+    function detectDefaultLayoutMode() {
+      const ua = navigator.userAgent || "";
+      const iPhoneLike = /iPhone|iPod/i.test(ua);
+      const mobileLike = /Android|Mobile/i.test(ua);
+      const narrowTouchPortrait = (
+        window.matchMedia("(pointer: coarse)").matches &&
+        window.matchMedia("(max-width: 600px)").matches &&
+        window.matchMedia("(orientation: portrait)").matches
+      );
+      return (iPhoneLike || (mobileLike && narrowTouchPortrait) || narrowTouchPortrait) ? "iphone" : "pc";
     }
 
     function parseNumber(value) {
@@ -1119,6 +1131,7 @@
       }
     });
 
+    setLayoutMode(detectDefaultLayoutMode());
     renderStockList();
     selectStock(state.selectedCode);
   </script>

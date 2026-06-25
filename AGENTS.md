@@ -5,10 +5,10 @@
 This file gives Codex project-level guidance.  
 Before analyzing, editing, or generating code, read and follow this file.
 
-## Naming rule
+## Title Naming rule
 
-if the titie as 'A1886 GEP Dataset Checker V14 2026.06.24 17:32'
-the version number should be added by one as 'V15'
+if the titie as eg 'title_example V07 2026.06.24 17:32'
+the version number should be added by one as 'V08'
 the date should be changed as the today eg '2026.mm.dd hh:mm'    
 
 ## User abbreviation rules
