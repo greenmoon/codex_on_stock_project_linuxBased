@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>codex_on_stock_project_linuxBased V02 2026.06.25 22:43</title>
+  <title>codex_on_stock_project_linuxBased V04 2026.06.26 22:38</title>
   <style>
     :root {
       color-scheme: light;
@@ -121,6 +121,12 @@
       color: #fff;
     }
 
+    #loadAllButton {
+      background: var(--amber);
+      border-color: var(--amber);
+      color: #fff;
+    }
+
     .filters {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -195,6 +201,61 @@
 
     .compact-stock-info {
       display: none;
+    }
+
+    .load-all-panel {
+      display: grid;
+      grid-template-columns: auto minmax(120px, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 10px;
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--panel);
+    }
+
+    .load-all-status {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .load-progress {
+      width: 100%;
+      height: 12px;
+      accent-color: var(--blue);
+    }
+
+    .load-progress.complete {
+      accent-color: var(--green);
+    }
+
+    .load-progress::-webkit-progress-bar {
+      background: #edf1ed;
+      border-radius: 999px;
+    }
+
+    .load-progress::-webkit-progress-value {
+      background: var(--blue);
+      border-radius: 999px;
+    }
+
+    .load-progress.complete::-webkit-progress-value {
+      background: var(--green);
+    }
+
+    .load-progress::-moz-progress-bar {
+      background: var(--blue);
+      border-radius: 999px;
+    }
+
+    .load-progress.complete::-moz-progress-bar {
+      background: var(--green);
     }
 
     .summary {
@@ -347,6 +408,29 @@
       white-space: nowrap;
     }
 
+    body.iphone-mode .load-all-panel {
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 5px 7px;
+      margin-bottom: 5px;
+      padding: 5px 7px;
+      border-radius: 6px;
+    }
+
+    body.iphone-mode #loadAllButton {
+      height: 32px;
+      padding: 0 9px;
+      font-size: 13px;
+    }
+
+    body.iphone-mode .load-all-status {
+      font-size: 12px;
+    }
+
+    body.iphone-mode .load-progress {
+      grid-column: 1 / -1;
+      height: 8px;
+    }
+
     body.iphone-mode .charts {
       gap: 0;
     }
@@ -362,7 +446,7 @@
     }
 
     body.iphone-mode #priceCanvas {
-      height: calc(100svh - 165px);
+      height: calc(100svh - 218px);
       min-height: 0;
     }
 
@@ -413,7 +497,7 @@
 <body>
   <header>
     <div>
-      <h1>codex_on_stock_project_linuxBased V02 2026.06.25 22:43</h1>
+      <h1>codex_on_stock_project_linuxBased V04 2026.06.26 22:38</h1>
       <div class="status">Browser version based on jb_A411B_stock_AI_v36b.py</div>
     </div>
     <div class="mode-buttons" aria-label="Layout mode">
@@ -452,6 +536,12 @@
       <div id="compactStockInfo" class="compact-stock-info">
         <strong id="compactStockNum">Num: ----</strong>
         <strong id="compactStockName">Name: Select a stock</strong>
+      </div>
+
+      <div id="loadAllPanel" class="load-all-panel">
+        <button id="loadAllButton" type="button">Load All</button>
+        <progress id="loadAllProgress" class="load-progress" value="0" max="1"></progress>
+        <div id="loadAllStatus" class="load-all-status">0 / 0</div>
       </div>
 
       <div id="summary" class="summary"></div>
@@ -545,7 +635,8 @@
       selectedCode: STOCKS[0].code,
       rows: [],
       hoverIndex: null,
-      layoutMode: "pc"
+      layoutMode: "pc",
+      loadAllRunning: false
     };
 
     const el = {
@@ -559,6 +650,9 @@
       loadStatus: document.getElementById("loadStatus"),
       compactStockNum: document.getElementById("compactStockNum"),
       compactStockName: document.getElementById("compactStockName"),
+      loadAllButton: document.getElementById("loadAllButton"),
+      loadAllProgress: document.getElementById("loadAllProgress"),
+      loadAllStatus: document.getElementById("loadAllStatus"),
       summary: document.getElementById("summary"),
       emptyState: document.getElementById("emptyState"),
       charts: document.getElementById("charts"),
@@ -594,6 +688,23 @@
         window.matchMedia("(orientation: portrait)").matches
       );
       return (iPhoneLike || (mobileLike && narrowTouchPortrait) || narrowTouchPortrait) ? "iphone" : "pc";
+    }
+
+    function updateLoadAllProgress(done, total, currentText = "", failed = 0, complete = false) {
+      el.loadAllProgress.max = total;
+      el.loadAllProgress.value = done;
+      el.loadAllProgress.classList.toggle("complete", complete);
+      const current = currentText ? `  ${currentText}` : "";
+      const failText = failed ? `  Failed: ${failed}` : "";
+      el.loadAllStatus.textContent = `${done} / ${total}${current}${failText}`;
+    }
+
+    async function loadStockRows(stock, forceReload = false) {
+      if (stock.rows && !forceReload) return stock.rows;
+      const rawRows = stock.market === "TPEX" ? await fetchTpexStock(stock.code) : await fetchTwseStock(stock.code);
+      if (rawRows.length < 2) throw new Error("No market data returned. This endpoint may block browser access.");
+      stock.rows = addIndicators(rawRows).slice(-60);
+      return stock.rows;
     }
 
     function parseNumber(value) {
@@ -1063,11 +1174,7 @@
       el.charts.hidden = false;
 
       try {
-        if (!stock.rows || forceReload) {
-          const rawRows = stock.market === "TPEX" ? await fetchTpexStock(stock.code) : await fetchTwseStock(stock.code);
-          if (rawRows.length < 2) throw new Error("No market data returned. This endpoint may block browser access.");
-          stock.rows = addIndicators(rawRows).slice(-60);
-        }
+        stock.rows = await loadStockRows(stock, forceReload);
         state.rows = stock.rows;
         renderSummary(stock, stock.rows);
         drawCharts(stock.rows);
@@ -1086,6 +1193,43 @@
       const current = list.findIndex((stock) => stock.code === state.selectedCode);
       const next = list[Math.min(list.length - 1, Math.max(0, current + step))];
       if (next) selectStock(next.code);
+    }
+
+    async function loadAllStocks() {
+      if (state.loadAllRunning) return;
+      state.loadAllRunning = true;
+      el.loadAllButton.disabled = true;
+      el.loadAllProgress.classList.remove("complete");
+
+      const total = STOCKS.length;
+      let failed = 0;
+      updateLoadAllProgress(0, total, "Starting", failed, false);
+
+      for (let i = 0; i < STOCKS.length; i += 1) {
+        const stock = STOCKS[i];
+        const currentText = `${stock.code} ${stock.name}`;
+        updateLoadAllProgress(i, total, currentText, failed, false);
+        el.loadStatus.textContent = `Load All ${i + 1}/${total}: ${stock.code} ${stock.name}`;
+
+        try {
+          await loadStockRows(stock, false);
+          if (stock.code === state.selectedCode) {
+            state.rows = stock.rows;
+            renderSummary(stock, stock.rows);
+            drawCharts(stock.rows);
+          }
+        } catch (_err) {
+          failed += 1;
+        }
+
+        updateLoadAllProgress(i + 1, total, currentText, failed, false);
+        await new Promise((resolve) => setTimeout(resolve, 20));
+      }
+
+      state.loadAllRunning = false;
+      el.loadAllButton.disabled = false;
+      updateLoadAllProgress(total, total, `OK: ${total - failed}`, failed, true);
+      el.loadStatus.textContent = `Load All done ${total}/${total}, failed=${failed}`;
     }
 
     for (const canvas of Object.values(el.canvases)) {
@@ -1111,6 +1255,7 @@
       if (first) selectStock(first.code);
     });
     el.reloadButton.addEventListener("click", () => selectStock(state.selectedCode, true));
+    el.loadAllButton.addEventListener("click", loadAllStocks);
     el.iphoneModeButton.addEventListener("click", () => setLayoutMode("iphone"));
     el.pcModeButton.addEventListener("click", () => setLayoutMode("pc"));
     el.prevButton.addEventListener("click", () => moveSelection(-1));
@@ -1132,6 +1277,7 @@
     });
 
     setLayoutMode(detectDefaultLayoutMode());
+    updateLoadAllProgress(0, STOCKS.length);
     renderStockList();
     selectStock(state.selectedCode);
   </script>

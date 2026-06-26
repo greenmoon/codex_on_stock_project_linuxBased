@@ -24,11 +24,11 @@ The user often uses short abbreviation commands. Interpret them as task modifier
 | `nu` | NUmeric explain method in step by step present how the priciple explore|
 | `ss` | Significant Summarize youtube, paper, source, screenshot, video, transcript, PDF, or provided text. |
 | `ee` | Enhencement English, Improve the user's English sentence and provide a clearer version and english and chinese both  |
-| `li` | Local Index html, Automatic run whole process built py->local html->open local index.html for checking
-| `uu` | Upload URL, Automatic run whole process built py->html->push->repo project->world wide URL |
-| `uun` | Run 'uu' and allowed 'n' times automatic reply 'yes' eg 'nn3' reply three times 'yes' when ask allowed to process|
-| `uc` | Update authorized code from local `authorized_code/code.txt`, commit, push, and open URL. |
-| `uc xxxxxx` | Update `authorized_code/code.txt` to `xxxxxx` in local folder, commit, push to repo project, and open URL. Example: `uc 112358`. |
+| `li` | Local Index html, Automatic run whole process built py->local html->auto open local index.html for checking
+| `uu` | Upload URL, Automatic run whole process built py->html->push->repo project->world wide URL, auto open repo index.html for checking |
+| `uunx` | Upload URL with number of x times 'y', Automatic run whole process built py->html->push->repo project->world wide URL, auto open repo index.html for checking |
+| `uc xxxxxx` | Update Code to local, `authorized_code/code.txt` to `xxxxxx` in local folder only, commit, push to repo project, and open URL. Example: `uc 112358`. |
+| `uc` | Update Code to repo, authorized code from local `authorized_code/code.txt`, commit, push, and open URL. local->repo|
 
 ## Interpretation examples
 
