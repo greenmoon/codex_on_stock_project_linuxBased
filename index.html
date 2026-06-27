@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>codex_on_stock_project_linuxBased V18 2026.06.27 14:55</title>
+  <title>codex_on_stock_project_linuxBased V21 2026.06.27 18:39</title>
   <style>
     :root {
       color-scheme: light;
@@ -430,6 +430,22 @@
       border-color: rgba(95, 108, 114, 0.45);
     }
 
+    .close-dot-label {
+      position: absolute;
+      z-index: 3;
+      padding: 2px 5px;
+      border: 1px solid #d13224;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.92);
+      color: #d13224;
+      font-family: ui-monospace, Menlo, Consolas, monospace;
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.1;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
     #volumeCanvas,
     #rsiCanvas,
     #macdCanvas {
@@ -635,7 +651,7 @@
 <body>
   <header>
     <div>
-      <h1>codex_on_stock_project_linuxBased V18 2026.06.27 14:55</h1>
+      <h1>codex_on_stock_project_linuxBased V21 2026.06.27 18:39</h1>
       <div class="status">Browser version based on jb_A411B_stock_AI_v36b.py</div>
     </div>
     <div class="mode-buttons" aria-label="Layout mode">
@@ -692,6 +708,7 @@
         <div id="priceShell" class="chart-shell">
           <div class="chart-label"><span>Price / Bollinger</span><span id="priceHint"></span></div>
           <div id="decisionOverlay" class="decision-overlay decision-wait" role="button" aria-label="Decision stock navigation">WAIT<span class="overlay-sub">close --</span></div>
+          <div id="closeDotLabel" class="close-dot-label" hidden>--</div>
           <canvas id="priceCanvas"></canvas>
         </div>
         <div id="volumeShell" class="chart-shell">
@@ -799,6 +816,7 @@
       emptyState: document.getElementById("emptyState"),
       charts: document.getElementById("charts"),
       decisionOverlay: document.getElementById("decisionOverlay"),
+      closeDotLabel: document.getElementById("closeDotLabel"),
       priceHint: document.getElementById("priceHint"),
       volumeHint: document.getElementById("volumeHint"),
       prevButton: document.getElementById("prevButton"),
@@ -1267,6 +1285,45 @@
       drawLine(ctx, rows, "close", min, max, width, height, pad, "#101820", 2);
       drawAxisLabels(ctx, [[max.toFixed(0), 18], [((max + min) / 2).toFixed(0), height / 2], [min.toFixed(0), height - 10]], width, height, pad);
       drawCursor(ctx, rows, min, max, width, height, pad);
+      positionDecisionOverlay(rows, min, max, width, height, pad);
+    }
+
+    function positionDecisionOverlay(rows, min, max, width, height, pad) {
+      const last = rows.at(-1);
+      if (!last) return;
+      const canvasRect = el.canvases.price.getBoundingClientRect();
+      const shellRect = el.canvases.price.parentElement.getBoundingClientRect();
+      const boxWidth = el.decisionOverlay.offsetWidth;
+      const boxHeight = el.decisionOverlay.offsetHeight;
+      const latestX = xFor(rows.length - 1, rows.length, width, pad);
+      const canvasLeft = canvasRect.left - shellRect.left;
+      const canvasTop = canvasRect.top - shellRect.top;
+      const rightEdge = Math.min(canvasLeft + latestX - 14, canvasLeft + width - pad - 10);
+      const minLeft = canvasLeft + pad + 8;
+      const maxLeft = canvasLeft + width - pad - boxWidth - 8;
+      const left = Math.min(Math.max(minLeft, rightEdge - boxWidth), Math.max(minLeft, maxLeft));
+      const minTop = canvasTop + pad + 8;
+      const maxTop = canvasTop + height - pad - boxHeight - 8;
+      const fixedTop = canvasTop + height * 0.76 - boxHeight / 2;
+      const top = Math.min(Math.max(minTop, fixedTop), Math.max(minTop, maxTop));
+      el.decisionOverlay.style.left = `${left}px`;
+      el.decisionOverlay.style.top = `${top}px`;
+      el.decisionOverlay.style.transform = "none";
+    }
+
+    function positionCloseDotLabel(close, x, y, width, pad) {
+      const canvasRect = el.canvases.price.getBoundingClientRect();
+      const shellRect = el.canvases.price.parentElement.getBoundingClientRect();
+      const canvasLeft = canvasRect.left - shellRect.left;
+      const canvasTop = canvasRect.top - shellRect.top;
+      el.closeDotLabel.hidden = false;
+      el.closeDotLabel.textContent = formatNumber(close, 1);
+      const labelWidth = el.closeDotLabel.offsetWidth;
+      const labelHeight = el.closeDotLabel.offsetHeight;
+      const left = Math.min(canvasLeft + width - pad - labelWidth - 6, canvasLeft + x + 8);
+      const top = Math.max(canvasTop + pad + 8, canvasTop + y - labelHeight / 2);
+      el.closeDotLabel.style.left = `${left}px`;
+      el.closeDotLabel.style.top = `${top}px`;
     }
 
     function drawVolume(rows) {
@@ -1332,6 +1389,9 @@
       ctx.beginPath();
       ctx.arc(x, y, 4, 0, Math.PI * 2);
       ctx.fill();
+      if (i === rows.length - 1) {
+        positionCloseDotLabel(row.close, x, y, width, pad);
+      }
       const sigma = row.std20 > 0 ? (row.close - row.ma20) / row.std20 : 0;
       const text = `${row.date}  Close ${formatNumber(row.close)}  sigma ${sigma >= 0 ? "+" : ""}${sigma.toFixed(2)}`;
       ctx.font = "13px ui-monospace, Menlo, Consolas, monospace";
