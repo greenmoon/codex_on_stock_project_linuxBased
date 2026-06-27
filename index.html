@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>codex_on_stock_project_linuxBased V14 2026.06.27 12:29</title>
+  <title>codex_on_stock_project_linuxBased V17 2026.06.27 14:46</title>
   <style>
     :root {
       color-scheme: light;
@@ -403,9 +403,9 @@
     .decision-overlay .overlay-sub {
       display: block;
       margin-top: 3px;
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 800;
+      color: currentColor;
+      font-size: 16px;
+      font-weight: 850;
     }
 
     .decision-overlay.decision-buy,
@@ -423,8 +423,8 @@
     }
 
     .decision-overlay.decision-wait {
-      color: var(--amber);
-      border-color: rgba(167, 101, 0, 0.45);
+      color: var(--muted);
+      border-color: rgba(95, 108, 114, 0.45);
     }
 
     #volumeCanvas,
@@ -632,7 +632,7 @@
 <body>
   <header>
     <div>
-      <h1>codex_on_stock_project_linuxBased V14 2026.06.27 12:29</h1>
+      <h1>codex_on_stock_project_linuxBased V17 2026.06.27 14:46</h1>
       <div class="status">Browser version based on jb_A411B_stock_AI_v36b.py</div>
     </div>
     <div class="mode-buttons" aria-label="Layout mode">
@@ -688,7 +688,7 @@
       <div id="charts" class="charts" hidden>
         <div id="priceShell" class="chart-shell">
           <div class="chart-label"><span>Price / Bollinger</span><span id="priceHint"></span></div>
-          <div id="decisionOverlay" class="decision-overlay decision-wait">Decision WAIT<span class="overlay-sub">sigma -- / close --</span></div>
+          <div id="decisionOverlay" class="decision-overlay decision-wait">WAIT<span class="overlay-sub">close --</span></div>
           <canvas id="priceCanvas"></canvas>
         </div>
         <div id="volumeShell" class="chart-shell">
@@ -772,7 +772,8 @@
       rows: [],
       hoverIndex: null,
       layoutMode: "pc",
-      loadAllRunning: false
+      loadAllRunning: false,
+      loadAllAutoStarted: false
     };
 
     const el = {
@@ -1142,12 +1143,18 @@
       return "";
     }
 
+    function decisionActionText(decision) {
+      if (decision.includes("BUY")) return "buy in";
+      if (decision.includes("SELL")) return "sell in";
+      return "wait in";
+    }
+
     function renderDecisionOverlay(decision, row) {
       const cls = `decision-${decision.toLowerCase().replaceAll(" ", "-")}`;
       const range = decisionRangeText(decision, row);
-      const rangeText = range ? ` (${range})` : "";
+      const rangeText = range ? ` ${decisionActionText(decision)} (${range})` : "";
       el.decisionOverlay.className = `decision-overlay ${cls}`;
-      el.decisionOverlay.innerHTML = `Decision ${decision}${rangeText}<span class="overlay-sub">Close ${formatNumber(row.close)}</span>`;
+      el.decisionOverlay.innerHTML = `${decision}<span class="overlay-sub">close ${formatNumber(row.close, 0)}${rangeText}</span>`;
     }
 
     function renderSummary(stock, rows) {
@@ -1371,7 +1378,7 @@
         el.emptyState.hidden = false;
         el.emptyState.textContent = `${stock.code} ${stock.name}: ${err.message}`;
         el.decisionOverlay.className = "decision-overlay decision-wait";
-        el.decisionOverlay.innerHTML = `Decision WAIT<span class="overlay-sub">data unavailable</span>`;
+        el.decisionOverlay.innerHTML = `WAIT<span class="overlay-sub">data unavailable</span>`;
         renderStockMeta(stock);
         el.loadStatus.textContent = "Load failed";
       }
@@ -1421,6 +1428,13 @@
       el.loadStatus.textContent = `Load All done ${total}/${total}, failed=${failed}`;
     }
 
+    function autoRunLoadAllWhenActive() {
+      if (state.loadAllAutoStarted || state.loadAllRunning) return;
+      if (document.visibilityState && document.visibilityState !== "visible") return;
+      state.loadAllAutoStarted = true;
+      window.setTimeout(loadAllStocks, 250);
+    }
+
     for (const canvas of Object.values(el.canvases)) {
       canvas.addEventListener("mousemove", (event) => {
         if (!state.rows.length) return;
@@ -1450,6 +1464,8 @@
     el.prevButton.addEventListener("click", () => moveSelection(-1));
     el.nextButton.addEventListener("click", () => moveSelection(1));
     window.addEventListener("resize", () => state.rows.length && drawCharts(state.rows));
+    window.addEventListener("pageshow", autoRunLoadAllWhenActive);
+    document.addEventListener("visibilitychange", autoRunLoadAllWhenActive);
     window.addEventListener("keydown", (event) => {
       if (event.target.matches("input, select")) return;
       if (event.code === "Space" || event.code === "ArrowDown") {
@@ -1469,6 +1485,7 @@
     updateLoadAllProgress(0, STOCKS.length);
     renderStockList();
     selectStock(state.selectedCode);
+    autoRunLoadAllWhenActive();
   </script>
 </body>
 </html>
