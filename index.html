@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>codex_on_stock_project_linuxBased V04 2026.06.26 22:38</title>
+  <title>codex_on_stock_project_linuxBased V14 2026.06.27 12:29</title>
   <style>
     :root {
       color-scheme: light;
@@ -23,8 +23,15 @@
 
     * { box-sizing: border-box; }
 
+    html {
+      height: 100%;
+      overflow: hidden;
+    }
+
     body {
       margin: 0;
+      height: 100%;
+      overflow: hidden;
       background: var(--bg);
       color: var(--ink);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
@@ -61,17 +68,27 @@
       align-items: center;
     }
 
-    .mode-button.active {
+    #iphoneModeButton {
+      background: var(--green);
+      border-color: var(--green);
+      color: #fff;
+    }
+
+    #pcModeButton {
       background: var(--blue);
       border-color: var(--blue);
       color: #fff;
     }
 
+    .mode-button:not(.active) {
+      opacity: 0.78;
+    }
+
     .app {
       height: calc(100vh - 58px);
       display: grid;
-      grid-template-columns: 320px minmax(0, 1fr);
-      min-height: 620px;
+      grid-template-columns: 360px minmax(0, 1fr);
+      min-height: 0;
     }
 
     aside {
@@ -80,6 +97,7 @@
       display: flex;
       flex-direction: column;
       min-width: 0;
+      min-height: 0;
     }
 
     .search {
@@ -134,6 +152,8 @@
     }
 
     .stock-list {
+      flex: 1 1 auto;
+      min-height: 0;
       overflow: auto;
       padding: 8px;
     }
@@ -174,6 +194,7 @@
 
     main {
       min-width: 0;
+      min-height: 0;
       overflow: auto;
       padding: 14px;
     }
@@ -193,6 +214,14 @@
       overflow-wrap: anywhere;
     }
 
+    .stock-meta {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+
     .status {
       color: var(--muted);
       font-size: 13px;
@@ -205,7 +234,7 @@
 
     .load-all-panel {
       display: grid;
-      grid-template-columns: auto minmax(120px, 1fr) auto;
+      grid-template-columns: auto minmax(0, 1fr);
       gap: 8px;
       align-items: center;
       margin-bottom: 10px;
@@ -213,6 +242,18 @@
       border: 1px solid var(--line);
       border-radius: 7px;
       background: var(--panel);
+    }
+
+    aside .load-all-panel {
+      margin: 10px 8px 8px;
+    }
+
+    aside .load-progress {
+      grid-column: 1 / -1;
+    }
+
+    aside .load-all-status {
+      text-align: right;
     }
 
     .load-all-status {
@@ -260,47 +301,59 @@
 
     .summary {
       display: grid;
-      grid-template-columns: repeat(6, minmax(110px, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 8px;
-      margin-bottom: 12px;
+      margin: 0 8px 8px;
     }
 
     .metric {
       background: var(--panel);
       border: 1px solid var(--line);
       border-radius: 7px;
-      padding: 10px;
-      min-height: 70px;
+      padding: 7px;
+      min-height: 50px;
     }
 
     .metric strong {
       display: block;
       color: var(--muted);
-      font-size: 12px;
-      margin-bottom: 5px;
+      font-size: 11px;
+      margin-bottom: 3px;
     }
 
     .metric span {
       display: block;
-      font-size: 18px;
+      font-size: 14px;
       font-weight: 800;
       overflow-wrap: anywhere;
     }
 
-    .decision-buy span { color: var(--green); }
-    .decision-sell span { color: var(--red); }
+    .decision-buy span,
+    .decision-strong-buy span,
+    .decision-near-buy span { color: var(--green); }
+
+    .decision-sell span,
+    .decision-strong-sell span,
+    .decision-near-sell span { color: var(--red); }
+
     .decision-wait span { color: var(--amber); }
 
     .charts {
       display: grid;
-      gap: 10px;
+      grid-template-rows: auto auto auto auto;
+      gap: 8px;
+      min-height: 0;
     }
 
     .chart-shell {
+      position: relative;
+      min-height: 0;
       background: var(--panel);
       border: 1px solid var(--line);
       border-radius: 8px;
-      padding: 10px;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
     }
 
     .chart-label {
@@ -314,16 +367,71 @@
 
     canvas {
       width: 100%;
+      flex: 1 1 auto;
+      min-height: 0;
       display: block;
       border: 1px solid #edf1ed;
       border-radius: 6px;
       background: #fff;
     }
 
-    #priceCanvas { height: 430px; }
-    #volumeCanvas { height: 105px; }
-    #rsiCanvas { height: 90px; }
-    #macdCanvas { height: 105px; }
+    #priceCanvas {
+      height: calc(100vh - 192px);
+      min-height: 430px;
+    }
+
+    .decision-overlay {
+      position: absolute;
+      left: 50%;
+      top: 56%;
+      transform: translate(-50%, -50%);
+      z-index: 2;
+      min-width: min(520px, calc(100% - 96px));
+      padding: 8px 12px;
+      border: 2px solid var(--line-strong);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.72);
+      color: var(--ink);
+      text-align: center;
+      font-size: 21px;
+      font-weight: 900;
+      line-height: 1.2;
+      pointer-events: none;
+      box-shadow: 0 4px 18px rgba(23, 32, 38, 0.12);
+    }
+
+    .decision-overlay .overlay-sub {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .decision-overlay.decision-buy,
+    .decision-overlay.decision-strong-buy,
+    .decision-overlay.decision-near-buy {
+      color: var(--green);
+      border-color: rgba(25, 122, 69, 0.45);
+    }
+
+    .decision-overlay.decision-sell,
+    .decision-overlay.decision-strong-sell,
+    .decision-overlay.decision-near-sell {
+      color: var(--red);
+      border-color: rgba(185, 47, 35, 0.45);
+    }
+
+    .decision-overlay.decision-wait {
+      color: var(--amber);
+      border-color: rgba(167, 101, 0, 0.45);
+    }
+
+    #volumeCanvas,
+    #rsiCanvas,
+    #macdCanvas {
+      height: 120px;
+    }
 
     body.iphone-mode header {
       height: auto;
@@ -408,6 +516,14 @@
       white-space: nowrap;
     }
 
+    body.iphone-mode #compactStockMeta {
+      grid-column: 1 / -1;
+      min-width: 0;
+      color: var(--muted);
+      font-size: 12px;
+      overflow-wrap: anywhere;
+    }
+
     body.iphone-mode .load-all-panel {
       grid-template-columns: auto minmax(0, 1fr);
       gap: 5px 7px;
@@ -433,6 +549,9 @@
 
     body.iphone-mode .charts {
       gap: 0;
+      height: auto;
+      min-height: 0;
+      grid-template-rows: none;
     }
 
     body.iphone-mode .chart-shell {
@@ -450,6 +569,16 @@
       min-height: 0;
     }
 
+    body.iphone-mode .decision-overlay {
+      min-width: min(340px, calc(100% - 32px));
+      padding: 8px 10px;
+      font-size: 20px;
+    }
+
+    body.iphone-mode .decision-overlay .overlay-sub {
+      font-size: 11px;
+    }
+
     .empty {
       padding: 42px 18px;
       text-align: center;
@@ -460,6 +589,12 @@
     }
 
     @media (max-width: 880px) {
+      html,
+      body {
+        height: auto;
+        overflow: auto;
+      }
+
       header {
         height: auto;
         align-items: flex-start;
@@ -497,7 +632,7 @@
 <body>
   <header>
     <div>
-      <h1>codex_on_stock_project_linuxBased V04 2026.06.26 22:38</h1>
+      <h1>codex_on_stock_project_linuxBased V14 2026.06.27 12:29</h1>
       <div class="status">Browser version based on jb_A411B_stock_AI_v36b.py</div>
     </div>
     <div class="mode-buttons" aria-label="Layout mode">
@@ -520,6 +655,12 @@
           <button id="reloadButton" class="primary" type="button">Reload</button>
         </div>
       </div>
+      <div id="loadAllPanel" class="load-all-panel">
+        <button id="loadAllButton" type="button">Load All</button>
+        <div id="loadAllStatus" class="load-all-status">0 / 0</div>
+        <progress id="loadAllProgress" class="load-progress" value="0" max="1"></progress>
+      </div>
+      <div id="summary" class="summary"></div>
       <div id="stockList" class="stock-list"></div>
     </aside>
 
@@ -527,6 +668,7 @@
       <div class="toolbar">
         <div>
           <div id="pageTitle" class="title">Select a stock</div>
+          <div id="stockMeta" class="stock-meta">(----, Select a stock, volume -, RSI -, MACD -, 0 / 0)</div>
           <div id="loadStatus" class="status">Ready</div>
         </div>
         <button id="prevButton" type="button">Prev</button>
@@ -536,15 +678,8 @@
       <div id="compactStockInfo" class="compact-stock-info">
         <strong id="compactStockNum">Num: ----</strong>
         <strong id="compactStockName">Name: Select a stock</strong>
+        <strong id="compactStockMeta">(----, Select a stock, volume -, RSI -, MACD -, 0 / 0)</strong>
       </div>
-
-      <div id="loadAllPanel" class="load-all-panel">
-        <button id="loadAllButton" type="button">Load All</button>
-        <progress id="loadAllProgress" class="load-progress" value="0" max="1"></progress>
-        <div id="loadAllStatus" class="load-all-status">0 / 0</div>
-      </div>
-
-      <div id="summary" class="summary"></div>
 
       <div id="emptyState" class="empty">
         Choose a stock from the left. The page will fetch recent market data and draw the indicators in the browser.
@@ -553,6 +688,7 @@
       <div id="charts" class="charts" hidden>
         <div id="priceShell" class="chart-shell">
           <div class="chart-label"><span>Price / Bollinger</span><span id="priceHint"></span></div>
+          <div id="decisionOverlay" class="decision-overlay decision-wait">Decision WAIT<span class="overlay-sub">sigma -- / close --</span></div>
           <canvas id="priceCanvas"></canvas>
         </div>
         <div id="volumeShell" class="chart-shell">
@@ -647,15 +783,18 @@
       reloadButton: document.getElementById("reloadButton"),
       stockList: document.getElementById("stockList"),
       pageTitle: document.getElementById("pageTitle"),
+      stockMeta: document.getElementById("stockMeta"),
       loadStatus: document.getElementById("loadStatus"),
       compactStockNum: document.getElementById("compactStockNum"),
       compactStockName: document.getElementById("compactStockName"),
+      compactStockMeta: document.getElementById("compactStockMeta"),
       loadAllButton: document.getElementById("loadAllButton"),
       loadAllProgress: document.getElementById("loadAllProgress"),
       loadAllStatus: document.getElementById("loadAllStatus"),
       summary: document.getElementById("summary"),
       emptyState: document.getElementById("emptyState"),
       charts: document.getElementById("charts"),
+      decisionOverlay: document.getElementById("decisionOverlay"),
       priceHint: document.getElementById("priceHint"),
       volumeHint: document.getElementById("volumeHint"),
       prevButton: document.getElementById("prevButton"),
@@ -922,14 +1061,18 @@
       });
     }
 
-    function judge(row, market) {
-      if (market === "TPEX") {
-        if (row.macdGolden && row.rsi < 65) return "BUY";
-        if (row.macdDeath && row.rsi > 35) return "SELL";
-        return "WAIT";
-      }
-      if (row.macdGolden && row.rsi < 70) return "BUY";
-      if (row.macdDeath && row.rsi > 30) return "SELL";
+    function sigmaFor(row) {
+      return row.std20 > 0 ? (row.close - row.ma20) / row.std20 : 0;
+    }
+
+    function judge(row) {
+      const sigma = sigmaFor(row);
+      if (sigma >= 2.0) return "STRONG SELL";
+      if (sigma > 1.2) return "SELL";
+      if (sigma >= 0.6) return "NEAR SELL";
+      if (sigma <= -2.0) return "STRONG BUY";
+      if (sigma < -1.2) return "BUY";
+      if (sigma <= -0.6) return "NEAR BUY";
       return "WAIT";
     }
 
@@ -963,14 +1106,55 @@
       return value.toLocaleString(undefined, { maximumFractionDigits: digits, minimumFractionDigits: digits });
     }
 
+    function selectedPositionText(stock) {
+      const list = visibleStocks();
+      const index = list.findIndex((item) => item.code === stock.code);
+      const current = index >= 0 ? index + 1 : 0;
+      return `${current} / ${list.length}`;
+    }
+
+    function renderStockMeta(stock, row = null) {
+      const volume = row ? formatNumber(row.volume, 0) : "-";
+      const rsi = row ? formatNumber(row.rsi, 1) : "-";
+      const macd = row ? formatNumber(row.macd, 2) : "-";
+      const text = `(${stock.code}, ${stock.name}, volume ${volume}, RSI ${rsi}, MACD ${macd}, ${selectedPositionText(stock)})`;
+      el.stockMeta.textContent = text;
+      el.compactStockMeta.textContent = text;
+    }
+
     function metric(label, value, extraClass = "") {
       return `<div class="metric ${extraClass}"><strong>${label}</strong><span>${value}</span></div>`;
     }
 
+    function bandPrice(row, sigma) {
+      return row.ma20 + sigma * row.std20;
+    }
+
+    function priceBandText(row, lowSigma, highSigma) {
+      return `${formatNumber(bandPrice(row, lowSigma), 0)}, ${formatNumber(bandPrice(row, highSigma), 0)}`;
+    }
+
+    function decisionRangeText(decision, row) {
+      if (!Number.isFinite(row.std20) || row.std20 <= 0) return "";
+      if (decision.includes("BUY")) return priceBandText(row, -2.0, -1.2);
+      if (decision.includes("SELL")) return priceBandText(row, 1.2, 2.0);
+      if (decision === "WAIT") return priceBandText(row, -0.6, 0.6);
+      return "";
+    }
+
+    function renderDecisionOverlay(decision, row) {
+      const cls = `decision-${decision.toLowerCase().replaceAll(" ", "-")}`;
+      const range = decisionRangeText(decision, row);
+      const rangeText = range ? ` (${range})` : "";
+      el.decisionOverlay.className = `decision-overlay ${cls}`;
+      el.decisionOverlay.innerHTML = `Decision ${decision}${rangeText}<span class="overlay-sub">Close ${formatNumber(row.close)}</span>`;
+    }
+
     function renderSummary(stock, rows) {
       const last = rows.at(-1);
-      const decision = judge(last, stock.market);
-      const cls = decision === "BUY" ? "decision-buy" : decision === "SELL" ? "decision-sell" : "decision-wait";
+      const decision = judge(last);
+      const cls = `decision-${decision.toLowerCase().replaceAll(" ", "-")}`;
+      renderDecisionOverlay(decision, last);
       el.summary.innerHTML = [
         metric("Date", last.date),
         metric("Close", formatNumber(last.close)),
@@ -1169,6 +1353,7 @@
       el.pageTitle.textContent = `${stock.code}.${stock.market}  ${stock.name}`;
       el.compactStockNum.textContent = `Num: ${stock.code}`;
       el.compactStockName.textContent = `Name: ${stock.name}`;
+      renderStockMeta(stock);
       el.loadStatus.textContent = `Loading ${stock.market} ${stock.code}...`;
       el.emptyState.hidden = true;
       el.charts.hidden = false;
@@ -1178,12 +1363,16 @@
         state.rows = stock.rows;
         renderSummary(stock, stock.rows);
         drawCharts(stock.rows);
+        renderStockMeta(stock, stock.rows.at(-1));
         el.loadStatus.textContent = `Ready - ${stock.rows.at(-1).date}`;
       } catch (err) {
         el.summary.innerHTML = "";
         el.charts.hidden = true;
         el.emptyState.hidden = false;
         el.emptyState.textContent = `${stock.code} ${stock.name}: ${err.message}`;
+        el.decisionOverlay.className = "decision-overlay decision-wait";
+        el.decisionOverlay.innerHTML = `Decision WAIT<span class="overlay-sub">data unavailable</span>`;
+        renderStockMeta(stock);
         el.loadStatus.textContent = "Load failed";
       }
     }
