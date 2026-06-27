@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>codex_on_stock_project_linuxBased V17 2026.06.27 14:46</title>
+  <title>codex_on_stock_project_linuxBased V18 2026.06.27 14:55</title>
   <style>
     :root {
       color-scheme: light;
@@ -396,7 +396,10 @@
       font-size: 21px;
       font-weight: 900;
       line-height: 1.2;
-      pointer-events: none;
+      cursor: pointer;
+      pointer-events: auto;
+      touch-action: manipulation;
+      user-select: none;
       box-shadow: 0 4px 18px rgba(23, 32, 38, 0.12);
     }
 
@@ -632,7 +635,7 @@
 <body>
   <header>
     <div>
-      <h1>codex_on_stock_project_linuxBased V17 2026.06.27 14:46</h1>
+      <h1>codex_on_stock_project_linuxBased V18 2026.06.27 14:55</h1>
       <div class="status">Browser version based on jb_A411B_stock_AI_v36b.py</div>
     </div>
     <div class="mode-buttons" aria-label="Layout mode">
@@ -688,7 +691,7 @@
       <div id="charts" class="charts" hidden>
         <div id="priceShell" class="chart-shell">
           <div class="chart-label"><span>Price / Bollinger</span><span id="priceHint"></span></div>
-          <div id="decisionOverlay" class="decision-overlay decision-wait">WAIT<span class="overlay-sub">close --</span></div>
+          <div id="decisionOverlay" class="decision-overlay decision-wait" role="button" aria-label="Decision stock navigation">WAIT<span class="overlay-sub">close --</span></div>
           <canvas id="priceCanvas"></canvas>
         </div>
         <div id="volumeShell" class="chart-shell">
@@ -1391,6 +1394,20 @@
       if (next) selectStock(next.code);
     }
 
+    function handleDecisionOverlayClick(event) {
+      const rect = el.decisionOverlay.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      if (x <= rect.width * 0.25) {
+        event.preventDefault();
+        event.stopPropagation();
+        moveSelection(-1);
+      } else if (x >= rect.width * 0.75) {
+        event.preventDefault();
+        event.stopPropagation();
+        moveSelection(1);
+      }
+    }
+
     async function loadAllStocks() {
       if (state.loadAllRunning) return;
       state.loadAllRunning = true;
@@ -1463,6 +1480,7 @@
     el.pcModeButton.addEventListener("click", () => setLayoutMode("pc"));
     el.prevButton.addEventListener("click", () => moveSelection(-1));
     el.nextButton.addEventListener("click", () => moveSelection(1));
+    el.decisionOverlay.addEventListener("click", handleDecisionOverlayClick);
     window.addEventListener("resize", () => state.rows.length && drawCharts(state.rows));
     window.addEventListener("pageshow", autoRunLoadAllWhenActive);
     document.addEventListener("visibilitychange", autoRunLoadAllWhenActive);
