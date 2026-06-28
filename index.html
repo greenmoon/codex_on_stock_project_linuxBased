@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>codex_on_stock_project_linuxBased V21 2026.06.27 18:39</title>
+  <title>codex_on_stock_project_linuxBased V26 2026.06.28 11:35</title>
   <style>
     :root {
       color-scheme: light;
@@ -407,8 +407,8 @@
       display: block;
       margin-top: 3px;
       color: currentColor;
-      font-size: 16px;
-      font-weight: 850;
+      font-size: inherit;
+      font-weight: inherit;
     }
 
     .decision-overlay.decision-buy,
@@ -430,6 +430,26 @@
       border-color: rgba(95, 108, 114, 0.45);
     }
 
+    .chart-stock-label {
+      position: absolute;
+      z-index: 3;
+      left: 44px;
+      top: 42px;
+      max-width: min(520px, calc(100% - 88px));
+      padding: 3px 7px;
+      border: 1px solid var(--line-strong);
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.82);
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 850;
+      line-height: 1.15;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
     .close-dot-label {
       position: absolute;
       z-index: 3;
@@ -444,6 +464,32 @@
       line-height: 1.1;
       pointer-events: none;
       white-space: nowrap;
+    }
+
+    .chart-nodata {
+      position: absolute;
+      z-index: 2;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: min(560px, calc(100% - 96px));
+      padding: 18px 16px;
+      border: 1px dashed var(--line-strong);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.86);
+      color: var(--muted);
+      text-align: center;
+      font-size: 17px;
+      font-weight: 800;
+      line-height: 1.45;
+      pointer-events: none;
+    }
+
+    .chart-nodata strong {
+      display: block;
+      color: var(--ink);
+      font-size: 18px;
+      margin-bottom: 4px;
     }
 
     #volumeCanvas,
@@ -594,10 +640,6 @@
       font-size: 20px;
     }
 
-    body.iphone-mode .decision-overlay .overlay-sub {
-      font-size: 11px;
-    }
-
     .empty {
       padding: 42px 18px;
       text-align: center;
@@ -651,7 +693,7 @@
 <body>
   <header>
     <div>
-      <h1>codex_on_stock_project_linuxBased V21 2026.06.27 18:39</h1>
+      <h1>codex_on_stock_project_linuxBased V26 2026.06.28 11:35</h1>
       <div class="status">Browser version based on jb_A411B_stock_AI_v36b.py</div>
     </div>
     <div class="mode-buttons" aria-label="Layout mode">
@@ -707,8 +749,10 @@
       <div id="charts" class="charts" hidden>
         <div id="priceShell" class="chart-shell">
           <div class="chart-label"><span>Price / Bollinger</span><span id="priceHint"></span></div>
+          <div id="chartStockLabel" class="chart-stock-label">Num ---- Name Select a stock</div>
           <div id="decisionOverlay" class="decision-overlay decision-wait" role="button" aria-label="Decision stock navigation">WAIT<span class="overlay-sub">close --</span></div>
           <div id="closeDotLabel" class="close-dot-label" hidden>--</div>
+          <div id="chartNoData" class="chart-nodata" hidden><strong>NO DATA</strong>No market data returned</div>
           <canvas id="priceCanvas"></canvas>
         </div>
         <div id="volumeShell" class="chart-shell">
@@ -742,12 +786,12 @@
       { code: "3406", name: "Largan_玉晶光", market: "TWSE" },
       { code: "3017", name: "奇鋐", market: "TWSE" },
       { code: "2317", name: "HonHai_鴻海精密", market: "TWSE" },
-      { code: "4977", name: "GroupDar-KY_眾達-KY", market: "TPEX" },
+      { code: "4977", name: "GroupDar-KY_眾達-KY", market: "TWSE" },
       { code: "3450", name: "LianJun_聯鈞", market: "TWSE" },
       { code: "2357", name: "華碩", market: "TWSE" },
       { code: "2344", name: "華邦電", market: "TWSE" },
       { code: "2376", name: "技嘉", market: "TWSE" },
-      { code: "3555", name: "Dr_wang", market: "TWSE" },
+      { code: "3555", name: "Dr_wang", market: "TPEX" },
       { code: "3443", name: "創意", market: "TWSE" },
       { code: "6531", name: "愛普*(SRAM)", market: "TWSE" },
       { code: "6695", name: "芯鼎", market: "TWSE" },
@@ -758,9 +802,9 @@
       { code: "6770", name: "力積電", market: "TWSE" },
       { code: "2912", name: "President 7-11", market: "TWSE" },
       { code: "6515", name: "CPI_YingWei_穎崴 (CPO->)", market: "TWSE" },
-      { code: "6442", name: "GuangSheng_光聖", market: "TPEX" },
+      { code: "6442", name: "GuangSheng_光聖", market: "TWSE" },
       { code: "6789", name: "CaiYu_采鈺", market: "TWSE" },
-      { code: "6451", name: "XunXin-KY_訊芯-KY", market: "TPEX" },
+      { code: "6451", name: "XunXin-KY_訊芯-KY", market: "TWSE" },
       { code: "2455", name: "AllNew_全新", market: "TWSE" },
       { code: "4938", name: "和碩", market: "TWSE" },
       { code: "3231", name: "緯創", market: "TWSE" },
@@ -796,6 +840,9 @@
       loadAllAutoStarted: false
     };
 
+    const FETCH_TIMEOUT_MS = 4500;
+    const TPEX_EMPTY_DAY_LIMIT = 10;
+
     const el = {
       iphoneModeButton: document.getElementById("iphoneModeButton"),
       pcModeButton: document.getElementById("pcModeButton"),
@@ -815,8 +862,10 @@
       summary: document.getElementById("summary"),
       emptyState: document.getElementById("emptyState"),
       charts: document.getElementById("charts"),
+      chartStockLabel: document.getElementById("chartStockLabel"),
       decisionOverlay: document.getElementById("decisionOverlay"),
       closeDotLabel: document.getElementById("closeDotLabel"),
+      chartNoData: document.getElementById("chartNoData"),
       priceHint: document.getElementById("priceHint"),
       volumeHint: document.getElementById("volumeHint"),
       prevButton: document.getElementById("prevButton"),
@@ -862,10 +911,55 @@
 
     async function loadStockRows(stock, forceReload = false) {
       if (stock.rows && !forceReload) return stock.rows;
+      if (stock.market === "TPEX") {
+        const staticRows = await fetchStaticStockRows(stock);
+        if (staticRows.length >= 2) {
+          stock.rows = addIndicators(staticRows).slice(-60);
+          return stock.rows;
+        }
+      }
       const rawRows = stock.market === "TPEX" ? await fetchTpexStock(stock.code) : await fetchTwseStock(stock.code);
       if (rawRows.length < 2) throw new Error("No market data returned. This endpoint may block browser access.");
       stock.rows = addIndicators(rawRows).slice(-60);
       return stock.rows;
+    }
+
+    async function fetchWithTimeout(url, timeoutMs = FETCH_TIMEOUT_MS) {
+      const controller = new AbortController();
+      const timer = window.setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        return await fetch(url, { signal: controller.signal });
+      } catch (err) {
+        if (err.name === "AbortError") {
+          const timeoutError = new Error("No market data returned. Request timed out.");
+          timeoutError.name = "AbortError";
+          throw timeoutError;
+        }
+        throw err;
+      } finally {
+        window.clearTimeout(timer);
+      }
+    }
+
+    async function fetchStaticStockRows(stock) {
+      const url = `data/stocks/${stock.code}.json?v=${encodeURIComponent(document.title)}`;
+      try {
+        const response = await fetchWithTimeout(url, 1500);
+        if (!response.ok) return [];
+        const obj = await response.json();
+        const rows = Array.isArray(obj) ? obj : obj.rows;
+        if (!Array.isArray(rows)) return [];
+        return normalizeRows(rows.map((row) => ({
+          date: row.date || row.Date,
+          open: parseNumber(row.open ?? row.Open),
+          high: parseNumber(row.high ?? row.High),
+          low: parseNumber(row.low ?? row.Low),
+          close: parseNumber(row.close ?? row.Close),
+          volume: parseNumber(row.volume ?? row.Volume)
+        }))).slice(-60);
+      } catch (_err) {
+        return [];
+      }
     }
 
     function parseNumber(value) {
@@ -900,7 +994,7 @@
       for (const date of monthStarts(8)) {
         const url = new URL("https://www.twse.com.tw/exchangeReport/STOCK_DAY");
         url.search = new URLSearchParams({ response: "json", date, stockNo: code }).toString();
-        const response = await fetch(url);
+        const response = await fetchWithTimeout(url);
         if (!response.ok) continue;
         const obj = await response.json();
         if (!Array.isArray(obj.data)) continue;
@@ -920,6 +1014,27 @@
 
     function adToRoc(date) {
       return `${date.getFullYear() - 1911}/${String(date.getMonth() + 1).padStart(2, "0")}/${String(date.getDate()).padStart(2, "0")}`;
+    }
+
+    function tpexDailyUrls(day) {
+      const base = "https://www.tpex.org.tw/web/stock/aftertrading/otc_quotes_no1430/stk_wn1430_result.php";
+      const withDate = (format) => {
+        const url = new URL(base);
+        url.search = new URLSearchParams({ l: "zh-tw", o: format, se: "EW", d: adToRoc(day) }).toString();
+        return url;
+      };
+      const withoutDate = (format) => {
+        const url = new URL(base);
+        url.search = new URLSearchParams({ l: "zh-tw", o: format, se: "EW" }).toString();
+        return url;
+      };
+      return [
+        withDate("json"),
+        withDate("data"),
+        withDate("csv"),
+        withoutDate("json"),
+        withoutDate("data")
+      ];
     }
 
     function parseTpexObject(obj, fallbackDate) {
@@ -971,24 +1086,128 @@
       }).filter(Boolean);
     }
 
+    function parseCsvLine(line) {
+      const out = [];
+      let value = "";
+      let quoted = false;
+      for (let i = 0; i < line.length; i += 1) {
+        const ch = line[i];
+        if (ch === "\"") {
+          if (quoted && line[i + 1] === "\"") {
+            value += "\"";
+            i += 1;
+          } else {
+            quoted = !quoted;
+          }
+        } else if (ch === "," && !quoted) {
+          out.push(value.trim());
+          value = "";
+        } else {
+          value += ch;
+        }
+      }
+      out.push(value.trim());
+      return out;
+    }
+
+    function parseTpexText(text, fallbackDate) {
+      const trimmed = String(text || "").trim();
+      if (!trimmed || trimmed.length < 20) return [];
+      const head = trimmed.slice(0, 500).toLowerCase();
+      if (head.includes("<html") || head.includes("<!doctype")) return [];
+      if (trimmed.startsWith("{")) {
+        try {
+          return parseTpexObject(JSON.parse(trimmed), fallbackDate);
+        } catch (_err) {
+          return [];
+        }
+      }
+
+      const lines = trimmed
+        .replaceAll("\r\n", "\n")
+        .replaceAll("\r", "\n")
+        .split("\n")
+        .map((line) => line.trim())
+        .filter((line) => line && !line.startsWith("="));
+      if (!lines.length) return [];
+
+      const parsed = lines.map(parseCsvLine).filter((row) => row.length >= 4);
+      if (!parsed.length) return [];
+
+      let headerIndex = parsed.findIndex((row) => {
+        const textRow = row.join(",");
+        return (textRow.includes("代號") || textRow.includes("證券代號")) && textRow.includes("收盤") && textRow.includes("開盤");
+      });
+      let header;
+      let body;
+      if (headerIndex >= 0) {
+        header = parsed[headerIndex].map(String);
+        body = parsed.slice(headerIndex + 1);
+      } else {
+        header = ["資料日期", "代號", "名稱", "收盤", "漲跌", "開盤", "最高", "最低", "成交股數"];
+        body = parsed;
+      }
+
+      const findIndex = (words) => header.findIndex((h) => words.some((word) => h.includes(word)));
+      let iDate = findIndex(["資料日期", "日期"]);
+      let iCode = findIndex(["代號", "股票代號", "證券代號"]);
+      let iName = findIndex(["名稱", "股票名稱", "證券名稱"]);
+      let iClose = findIndex(["收盤"]);
+      let iOpen = findIndex(["開盤"]);
+      let iHigh = findIndex(["最高"]);
+      let iLow = findIndex(["最低"]);
+      let iVol = findIndex(["成交股數", "成交仟股", "成交數量"]);
+
+      return body.map((row) => {
+        if (iCode < 0 && row.length >= 9) {
+          iDate = 0; iCode = 1; iName = 2; iClose = 3; iOpen = 5; iHigh = 6; iLow = 7; iVol = 8;
+        }
+        return {
+          date: rocToDate(row[iDate]) || fallbackDate,
+          code: String(row[iCode] || "").trim(),
+          name: String(row[iName] || "").trim(),
+          open: parseNumber(row[iOpen]),
+          high: parseNumber(row[iHigh]),
+          low: parseNumber(row[iLow]),
+          close: parseNumber(row[iClose]),
+          volume: parseNumber(row[iVol])
+        };
+      }).filter((row) => row.code && Number.isFinite(row.close));
+    }
+
+    async function fetchTpexDay(day) {
+      const fallbackDate = day.toISOString().slice(0, 10);
+      for (const url of tpexDailyUrls(day)) {
+        try {
+          const response = await fetchWithTimeout(url);
+          if (!response.ok) continue;
+          const text = await response.text();
+          const rows = parseTpexText(text, fallbackDate);
+          if (rows.length) return rows;
+        } catch (err) {
+          if (err.name === "AbortError") throw err;
+        }
+      }
+      return [];
+    }
+
     async function fetchTpexStock(code) {
       const rows = [];
       const today = new Date();
+      let emptyTradingDays = 0;
       for (let offset = 0; offset < 160 && rows.length < 60; offset += 1) {
         const day = new Date(today);
         day.setDate(today.getDate() - offset);
         if (day.getDay() === 0 || day.getDay() === 6) continue;
-        const fallbackDate = day.toISOString().slice(0, 10);
-        const base = "https://www.tpex.org.tw/web/stock/aftertrading/otc_quotes_no1430/stk_wn1430_result.php";
-        const url = new URL(base);
-        url.search = new URLSearchParams({ l: "zh-tw", o: "json", se: "EW", d: adToRoc(day) }).toString();
         try {
-          const response = await fetch(url);
-          if (!response.ok) continue;
-          const obj = await response.json();
-          const dayRows = parseTpexObject(obj, fallbackDate).filter((row) => row.code === code);
+          const dayRows = (await fetchTpexDay(day)).filter((row) => row.code === code);
+          if (dayRows.length === 0 && rows.length === 0) {
+            emptyTradingDays += 1;
+            if (emptyTradingDays >= TPEX_EMPTY_DAY_LIMIT) break;
+          }
           rows.push(...dayRows.map(({ code: _code, name: _name, ...row }) => row));
-        } catch (_err) {
+        } catch (err) {
+          if (err.name === "AbortError") throw err;
           continue;
         }
       }
@@ -1170,19 +1389,20 @@
       return "wait in";
     }
 
-    function renderDecisionOverlay(decision, row) {
+    function renderDecisionOverlay(stock, decision, row) {
       const cls = `decision-${decision.toLowerCase().replaceAll(" ", "-")}`;
       const range = decisionRangeText(decision, row);
       const rangeText = range ? ` ${decisionActionText(decision)} (${range})` : "";
+      const position = selectedPositionText(stock);
       el.decisionOverlay.className = `decision-overlay ${cls}`;
-      el.decisionOverlay.innerHTML = `${decision}<span class="overlay-sub">close ${formatNumber(row.close, 0)}${rangeText}</span>`;
+      el.decisionOverlay.innerHTML = `${decision} ${position}<span class="overlay-sub">close ${formatNumber(row.close, 0)}${rangeText}</span>`;
     }
 
     function renderSummary(stock, rows) {
       const last = rows.at(-1);
       const decision = judge(last);
       const cls = `decision-${decision.toLowerCase().replaceAll(" ", "-")}`;
-      renderDecisionOverlay(decision, last);
+      renderDecisionOverlay(stock, decision, last);
       el.summary.innerHTML = [
         metric("Date", last.date),
         metric("Close", formatNumber(last.close)),
@@ -1201,6 +1421,42 @@
       const ctx = canvas.getContext("2d");
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       return { ctx, width: canvas.width / dpr, height: canvas.height / dpr, pad: 32 };
+    }
+
+    function clearCanvas(canvas) {
+      const { ctx, width, height } = setupCanvas(canvas);
+      ctx.clearRect(0, 0, width, height);
+    }
+
+    function clearChartState() {
+      state.rows = [];
+      state.hoverIndex = null;
+      Object.values(el.canvases).forEach(clearCanvas);
+      el.closeDotLabel.hidden = true;
+      el.chartNoData.hidden = true;
+      el.priceHint.textContent = "";
+      el.volumeHint.textContent = "";
+      el.summary.innerHTML = "";
+      el.decisionOverlay.className = "decision-overlay decision-wait";
+      el.decisionOverlay.innerHTML = `WAIT<span class="overlay-sub">loading</span>`;
+    }
+
+    function renderNoDataChart(stock, message) {
+      clearChartState();
+      el.charts.hidden = false;
+      el.emptyState.hidden = true;
+      el.chartNoData.hidden = false;
+      el.chartNoData.innerHTML = `<strong>Num ${stock.code} Name ${stock.name}</strong>${message}`;
+      el.decisionOverlay.className = "decision-overlay decision-wait";
+      el.decisionOverlay.innerHTML = `NO DATA<span class="overlay-sub">curve unavailable</span>`;
+      el.summary.innerHTML = [
+        metric("Date", "-"),
+        metric("Close", "-"),
+        metric("RSI", "-"),
+        metric("MACD", "-"),
+        metric("Market", stock.market),
+        metric("Decision", "NO DATA", "decision-wait")
+      ].join("");
     }
 
     function range(values, padRatio = 0.08) {
@@ -1408,6 +1664,7 @@
     }
 
     function drawCharts(rows) {
+      el.chartNoData.hidden = true;
       drawPrice(rows);
       if (state.layoutMode === "iphone") return;
       drawVolume(rows);
@@ -1423,6 +1680,8 @@
       el.pageTitle.textContent = `${stock.code}.${stock.market}  ${stock.name}`;
       el.compactStockNum.textContent = `Num: ${stock.code}`;
       el.compactStockName.textContent = `Name: ${stock.name}`;
+      el.chartStockLabel.textContent = `Num ${stock.code} Name ${stock.name}`;
+      clearChartState();
       renderStockMeta(stock);
       el.loadStatus.textContent = `Loading ${stock.market} ${stock.code}...`;
       el.emptyState.hidden = true;
@@ -1436,12 +1695,7 @@
         renderStockMeta(stock, stock.rows.at(-1));
         el.loadStatus.textContent = `Ready - ${stock.rows.at(-1).date}`;
       } catch (err) {
-        el.summary.innerHTML = "";
-        el.charts.hidden = true;
-        el.emptyState.hidden = false;
-        el.emptyState.textContent = `${stock.code} ${stock.name}: ${err.message}`;
-        el.decisionOverlay.className = "decision-overlay decision-wait";
-        el.decisionOverlay.innerHTML = `WAIT<span class="overlay-sub">data unavailable</span>`;
+        renderNoDataChart(stock, err.message);
         renderStockMeta(stock);
         el.loadStatus.textContent = "Load failed";
       }
@@ -1482,7 +1736,9 @@
         const stock = STOCKS[i];
         const currentText = `${stock.code} ${stock.name}`;
         updateLoadAllProgress(i, total, currentText, failed, false);
-        el.loadStatus.textContent = `Load All ${i + 1}/${total}: ${stock.code} ${stock.name}`;
+        if (stock.code === state.selectedCode) {
+          el.loadStatus.textContent = `Load All ${i + 1}/${total}: ${stock.code} ${stock.name}`;
+        }
 
         try {
           await loadStockRows(stock, false);
@@ -1493,6 +1749,9 @@
           }
         } catch (_err) {
           failed += 1;
+          if (stock.code === state.selectedCode && !state.rows.length) {
+            el.loadStatus.textContent = "Load failed";
+          }
         }
 
         updateLoadAllProgress(i + 1, total, currentText, failed, false);
@@ -1502,7 +1761,11 @@
       state.loadAllRunning = false;
       el.loadAllButton.disabled = false;
       updateLoadAllProgress(total, total, `OK: ${total - failed}`, failed, true);
-      el.loadStatus.textContent = `Load All done ${total}/${total}, failed=${failed}`;
+      if (state.rows.length) {
+        el.loadStatus.textContent = `Ready - ${state.rows.at(-1).date}`;
+      } else if (!el.chartNoData.hidden) {
+        el.loadStatus.textContent = "Load failed";
+      }
     }
 
     function autoRunLoadAllWhenActive() {
