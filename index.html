@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>codex_on_stock_project_linuxBased V27 2026.06.28 18:48</title>
+  <title>codex_on_stock_project_linuxBased V31 2026.06.28 20:09</title>
   <style>
     :root {
       color-scheme: light;
@@ -137,6 +137,22 @@
       background: var(--green);
       border-color: var(--green);
       color: #fff;
+    }
+
+    #sellSignalButton,
+    #buySignalButton {
+      display: none;
+      color: #fff;
+    }
+
+    #sellSignalButton {
+      background: var(--red);
+      border-color: var(--red);
+    }
+
+    #buySignalButton {
+      background: var(--green);
+      border-color: var(--green);
     }
 
     #loadAllButton {
@@ -561,6 +577,11 @@
       display: none;
     }
 
+    body.iphone-mode #sellSignalButton,
+    body.iphone-mode #buySignalButton {
+      display: block;
+    }
+
     body.iphone-mode .compact-stock-info {
       display: grid;
       grid-template-columns: auto minmax(0, 1fr);
@@ -698,7 +719,7 @@
 <body>
   <header>
     <div>
-      <h1>codex_on_stock_project_linuxBased V27 2026.06.28 18:48</h1>
+      <h1>codex_on_stock_project_linuxBased V31 2026.06.28 20:09</h1>
       <div class="status">Browser version based on jb_A411B_stock_AI_v36b.py</div>
     </div>
     <div class="mode-buttons" aria-label="Layout mode">
@@ -739,6 +760,8 @@
         </div>
         <button id="prevButton" type="button">Prev</button>
         <button id="nextButton" type="button">Next</button>
+        <button id="sellSignalButton" type="button">STRONG SELL and SELL</button>
+        <button id="buySignalButton" type="button">STRONG BUY and BUY</button>
       </div>
 
       <div id="compactStockInfo" class="compact-stock-info">
@@ -842,7 +865,8 @@
       hoverIndex: null,
       layoutMode: "pc",
       loadAllRunning: false,
-      loadAllAutoStarted: false
+      loadAllAutoStarted: false,
+      signalRunning: false
     };
 
     const FETCH_TIMEOUT_MS = 4500;
@@ -864,6 +888,8 @@
       loadAllButton: document.getElementById("loadAllButton"),
       loadAllProgress: document.getElementById("loadAllProgress"),
       loadAllStatus: document.getElementById("loadAllStatus"),
+      sellSignalButton: document.getElementById("sellSignalButton"),
+      buySignalButton: document.getElementById("buySignalButton"),
       summary: document.getElementById("summary"),
       emptyState: document.getElementById("emptyState"),
       charts: document.getElementById("charts"),
@@ -1401,7 +1427,8 @@
       const position = selectedPositionText(stock);
       el.decisionOverlay.className = `decision-overlay ${cls}`;
       el.decisionOverlay.innerHTML = [
-        `Name: ${stock.name} ${decision} ${position}`,
+        `Name: ${stock.name}`,
+        `<span class="overlay-sub">${decision} ${position}</span>`,
         `<span class="overlay-sub">close ${formatNumber(row.close, 0)}</span>`,
         rangeText ? `<span class="overlay-sub">${rangeText}</span>` : ""
       ].join("");
@@ -1719,6 +1746,95 @@
       if (next) selectStock(next.code);
     }
 
+    function signalRank(decision, side) {
+      if (side === "buy" && decision === "STRONG BUY") return 0;
+      if (side === "buy" && decision === "BUY") return 1;
+      if (side === "sell" && decision === "STRONG SELL") return 0;
+      if (side === "sell" && decision === "SELL") return 1;
+      return 99;
+    }
+
+    function signalCandidates(list, side) {
+      const candidates = [];
+      for (let i = 0; i < list.length; i += 1) {
+        const stock = list[i];
+        const last = stock.rows?.at(-1);
+        if (!last) continue;
+        const decision = judge(last);
+        const rank = signalRank(decision, side);
+        if (rank < 99) candidates.push({ stock, decision, rank, index: i });
+      }
+      candidates.sort((a, b) => a.rank - b.rank || a.index - b.index);
+      return candidates;
+    }
+
+    async function waitForCachedSignals(list, side, timeoutMs = 5000) {
+      const started = Date.now();
+      let candidates = signalCandidates(list, side);
+      while (!candidates.length && state.loadAllRunning && Date.now() - started < timeoutMs) {
+        await new Promise((resolve) => setTimeout(resolve, 200));
+        candidates = signalCandidates(list, side);
+      }
+      return candidates;
+    }
+
+    function resetFiltersForSignals() {
+      const changed = el.findInput.value || el.marketFilter.value !== "ALL";
+      el.findInput.value = "";
+      el.marketFilter.value = "ALL";
+      if (changed) renderStockList();
+    }
+
+    function signalLabel(side) {
+      return side === "sell" ? "sell signal" : "buy signal";
+    }
+
+    async function jumpToSignal(side) {
+      if (state.signalRunning) return;
+      state.signalRunning = true;
+      const button = side === "sell" ? el.sellSignalButton : el.buySignalButton;
+      button.disabled = true;
+      const oldText = button.textContent;
+      button.textContent = "Checking...";
+
+      try {
+        resetFiltersForSignals();
+        const list = STOCKS;
+        let candidates = signalCandidates(list, side);
+        if (!candidates.length && state.loadAllRunning) {
+          candidates = await waitForCachedSignals(list, side);
+        }
+        if (!candidates.length && !state.loadAllRunning) {
+          await loadAllStocks();
+          candidates = signalCandidates(list, side);
+        }
+
+        const current = candidates.findIndex((item) => item.stock.code === state.selectedCode);
+        if (candidates.length && current < candidates.length - 1) {
+          await selectStock(candidates[current + 1].stock.code);
+        } else if (candidates.length && current < 0) {
+          await selectStock(candidates[0].stock.code);
+        } else if (list[0]) {
+          await selectStock(list[0].code);
+        }
+
+        const label = signalLabel(side);
+        el.loadStatus.textContent = candidates.length ? `${candidates.length} ${label}` : `No ${label.toUpperCase()}`;
+      } finally {
+        state.signalRunning = false;
+        button.disabled = false;
+        button.textContent = oldText;
+      }
+    }
+
+    function jumpToBuySignal() {
+      jumpToSignal("buy");
+    }
+
+    function jumpToSellSignal() {
+      jumpToSignal("sell");
+    }
+
     function handleDecisionOverlayClick(event) {
       const rect = el.decisionOverlay.getBoundingClientRect();
       const x = event.clientX - rect.left;
@@ -1810,6 +1926,8 @@
     });
     el.reloadButton.addEventListener("click", () => selectStock(state.selectedCode, true));
     el.loadAllButton.addEventListener("click", loadAllStocks);
+    el.sellSignalButton.addEventListener("click", jumpToSellSignal);
+    el.buySignalButton.addEventListener("click", jumpToBuySignal);
     el.iphoneModeButton.addEventListener("click", () => setLayoutMode("iphone"));
     el.pcModeButton.addEventListener("click", () => setLayoutMode("pc"));
     el.prevButton.addEventListener("click", () => moveSelection(-1));
