@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>codex_on_stock_project_linuxBased V26 2026.06.28 11:35</title>
+  <title>codex_on_stock_project_linuxBased V27 2026.06.28 18:48</title>
   <style>
     :root {
       color-scheme: light;
@@ -556,6 +556,11 @@
       font-size: 16px;
     }
 
+    body.iphone-mode #prevButton,
+    body.iphone-mode #nextButton {
+      display: none;
+    }
+
     body.iphone-mode .compact-stock-info {
       display: grid;
       grid-template-columns: auto minmax(0, 1fr);
@@ -693,7 +698,7 @@
 <body>
   <header>
     <div>
-      <h1>codex_on_stock_project_linuxBased V26 2026.06.28 11:35</h1>
+      <h1>codex_on_stock_project_linuxBased V27 2026.06.28 18:48</h1>
       <div class="status">Browser version based on jb_A411B_stock_AI_v36b.py</div>
     </div>
     <div class="mode-buttons" aria-label="Layout mode">
@@ -1386,16 +1391,20 @@
     function decisionActionText(decision) {
       if (decision.includes("BUY")) return "buy in";
       if (decision.includes("SELL")) return "sell in";
-      return "wait in";
+      return "within";
     }
 
     function renderDecisionOverlay(stock, decision, row) {
       const cls = `decision-${decision.toLowerCase().replaceAll(" ", "-")}`;
       const range = decisionRangeText(decision, row);
-      const rangeText = range ? ` ${decisionActionText(decision)} (${range})` : "";
+      const rangeText = range ? `${decisionActionText(decision)} (${range})` : "";
       const position = selectedPositionText(stock);
       el.decisionOverlay.className = `decision-overlay ${cls}`;
-      el.decisionOverlay.innerHTML = `${decision} ${position}<span class="overlay-sub">close ${formatNumber(row.close, 0)}${rangeText}</span>`;
+      el.decisionOverlay.innerHTML = [
+        `Name: ${stock.name} ${decision} ${position}`,
+        `<span class="overlay-sub">close ${formatNumber(row.close, 0)}</span>`,
+        rangeText ? `<span class="overlay-sub">${rangeText}</span>` : ""
+      ].join("");
     }
 
     function renderSummary(stock, rows) {
@@ -1554,9 +1563,11 @@
       const latestX = xFor(rows.length - 1, rows.length, width, pad);
       const canvasLeft = canvasRect.left - shellRect.left;
       const canvasTop = canvasRect.top - shellRect.top;
-      const rightEdge = Math.min(canvasLeft + latestX - 14, canvasLeft + width - pad - 10);
+      const rightGap = state.layoutMode === "iphone" ? 82 : 14;
+      const edgeGap = state.layoutMode === "iphone" ? 78 : 10;
+      const rightEdge = Math.min(canvasLeft + latestX - rightGap, canvasLeft + width - pad - edgeGap);
       const minLeft = canvasLeft + pad + 8;
-      const maxLeft = canvasLeft + width - pad - boxWidth - 8;
+      const maxLeft = canvasLeft + width - pad - boxWidth - edgeGap;
       const left = Math.min(Math.max(minLeft, rightEdge - boxWidth), Math.max(minLeft, maxLeft));
       const minTop = canvasTop + pad + 8;
       const maxTop = canvasTop + height - pad - boxHeight - 8;
