@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>codex_on_stock_project_linuxBased V31 2026.06.28 20:09</title>
+  <title>codex_on_stock_project_linuxBased V32 2026.07.02 20:44</title>
   <style>
     :root {
       color-scheme: light;
@@ -719,7 +719,7 @@
 <body>
   <header>
     <div>
-      <h1>codex_on_stock_project_linuxBased V31 2026.06.28 20:09</h1>
+      <h1>codex_on_stock_project_linuxBased V32 2026.07.02 20:44</h1>
       <div class="status">Browser version based on jb_A411B_stock_AI_v36b.py</div>
     </div>
     <div class="mode-buttons" aria-label="Layout mode">
@@ -871,6 +871,7 @@
 
     const FETCH_TIMEOUT_MS = 4500;
     const TPEX_EMPTY_DAY_LIMIT = 10;
+    const TPEX_STATIC_MAX_AGE_DAYS = 4;
 
     const el = {
       iphoneModeButton: document.getElementById("iphoneModeButton"),
@@ -942,17 +943,41 @@
 
     async function loadStockRows(stock, forceReload = false) {
       if (stock.rows && !forceReload) return stock.rows;
+      let staticRows = [];
       if (stock.market === "TPEX") {
-        const staticRows = await fetchStaticStockRows(stock);
-        if (staticRows.length >= 2) {
+        staticRows = await fetchStaticStockRows(stock);
+        if (!forceReload && staticRows.length >= 2 && rowsAreRecent(staticRows, TPEX_STATIC_MAX_AGE_DAYS)) {
           stock.rows = addIndicators(staticRows).slice(-60);
           return stock.rows;
         }
       }
-      const rawRows = stock.market === "TPEX" ? await fetchTpexStock(stock.code) : await fetchTwseStock(stock.code);
-      if (rawRows.length < 2) throw new Error("No market data returned. This endpoint may block browser access.");
-      stock.rows = addIndicators(rawRows).slice(-60);
-      return stock.rows;
+      try {
+        const rawRows = stock.market === "TPEX" ? await fetchTpexStock(stock.code) : await fetchTwseStock(stock.code);
+        if (rawRows.length < 2) throw new Error("No market data returned. This endpoint may block browser access.");
+        stock.rows = addIndicators(rawRows).slice(-60);
+        return stock.rows;
+      } catch (err) {
+        if (staticRows.length >= 2) {
+          stock.rows = addIndicators(staticRows).slice(-60);
+          return stock.rows;
+        }
+        throw err;
+      }
+    }
+
+    function rowDateValue(dateText) {
+      const parts = String(dateText || "").split("-").map(Number);
+      if (parts.length !== 3 || parts.some((part) => !Number.isFinite(part))) return NaN;
+      return new Date(parts[0], parts[1] - 1, parts[2]).getTime();
+    }
+
+    function rowsAreRecent(rows, maxAgeDays) {
+      const latestTime = rowDateValue(rows.at(-1)?.date);
+      if (!Number.isFinite(latestTime)) return false;
+      const now = new Date();
+      const todayTime = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+      const ageDays = Math.floor((todayTime - latestTime) / 86400000);
+      return ageDays <= maxAgeDays;
     }
 
     async function fetchWithTimeout(url, timeoutMs = FETCH_TIMEOUT_MS) {
