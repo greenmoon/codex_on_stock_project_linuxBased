@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>codex_on_stock_project_linuxBased V33 2026.07.09 13:20</title>
+  <title>codex_on_stock_project_linuxBased V34 2026.07.09 13:23</title>
   <style>
     :root {
       color-scheme: light;
@@ -17,8 +17,8 @@
       --green: #197a45;
       --red: #b92f23;
       --amber: #a76500;
-      --purple: #7a3db8;
-      --yellow: #b88a00;
+      --light-green: #4fa76e;
+      --light-red: #d96b5f;
       --soft-blue: #d9ecff;
       --soft-green: #e4f4ea;
     }
@@ -350,10 +350,10 @@
 
     .decision-near-sell span { color: var(--red); }
 
-    .decision-strong-sell span { color: var(--purple); }
-    .decision-sell span { color: var(--green); }
-    .decision-strong-buy span { color: var(--red); }
-    .decision-buy span { color: var(--yellow); }
+    .decision-strong-sell span { color: var(--red); }
+    .decision-sell span { color: var(--light-red); }
+    .decision-strong-buy span { color: var(--green); }
+    .decision-buy span { color: var(--light-green); }
     .decision-wait span { color: var(--amber); }
 
     .charts {
@@ -440,23 +440,23 @@
     }
 
     .decision-overlay.decision-strong-sell {
-      color: var(--purple);
-      border-color: rgba(122, 61, 184, 0.45);
-    }
-
-    .decision-overlay.decision-sell {
-      color: var(--green);
-      border-color: rgba(25, 122, 69, 0.45);
-    }
-
-    .decision-overlay.decision-strong-buy {
       color: var(--red);
       border-color: rgba(185, 47, 35, 0.45);
     }
 
+    .decision-overlay.decision-sell {
+      color: var(--light-red);
+      border-color: rgba(217, 107, 95, 0.45);
+    }
+
+    .decision-overlay.decision-strong-buy {
+      color: var(--green);
+      border-color: rgba(25, 122, 69, 0.45);
+    }
+
     .decision-overlay.decision-buy {
-      color: var(--yellow);
-      border-color: rgba(184, 138, 0, 0.45);
+      color: var(--light-green);
+      border-color: rgba(79, 167, 110, 0.45);
     }
 
     .decision-overlay.decision-wait {
@@ -737,7 +737,7 @@
 <body>
   <header>
     <div>
-      <h1>codex_on_stock_project_linuxBased V33 2026.07.09 13:20</h1>
+      <h1>codex_on_stock_project_linuxBased V34 2026.07.09 13:23</h1>
       <div class="status">Browser version based on jb_A411B_stock_AI_v36b.py</div>
     </div>
     <div class="mode-buttons" aria-label="Layout mode">
