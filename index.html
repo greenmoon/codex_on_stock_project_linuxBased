@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>codex_on_stock_project_linuxBased V34 2026.07.09 13:23</title>
+  <title>codex_on_stock_project_linuxBased V35 2026.07.09 14:06</title>
   <style>
     :root {
       color-scheme: light;
@@ -737,7 +737,7 @@
 <body>
   <header>
     <div>
-      <h1>codex_on_stock_project_linuxBased V34 2026.07.09 13:23</h1>
+      <h1>codex_on_stock_project_linuxBased V35 2026.07.09 14:06</h1>
       <div class="status">Browser version based on jb_A411B_stock_AI_v36b.py</div>
     </div>
     <div class="mode-buttons" aria-label="Layout mode">
@@ -1585,6 +1585,21 @@
       ctx.stroke();
     }
 
+    function drawCloseDots(ctx, rows, min, max, width, height, pad) {
+      ctx.fillStyle = "#ffffff";
+      ctx.strokeStyle = "#101820";
+      ctx.lineWidth = 1.2;
+      rows.forEach((row, i) => {
+        if (!Number.isFinite(row.close)) return;
+        const x = xFor(i, rows.length, width, pad);
+        const y = yFor(row.close, min, max, height, pad);
+        ctx.beginPath();
+        ctx.arc(x, y, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+      });
+    }
+
     function drawBand(ctx, rows, topField, bottomField, min, max, width, height, pad, color) {
       ctx.fillStyle = color;
       ctx.beginPath();
@@ -1618,6 +1633,7 @@
       drawBand(ctx, rows, "bbu12", "bbl12", min, max, width, height, pad, "rgba(93, 162, 219, 0.28)");
       drawLine(ctx, rows, "ma20", min, max, width, height, pad, "#d87900", 2);
       drawLine(ctx, rows, "close", min, max, width, height, pad, "#101820", 2);
+      drawCloseDots(ctx, rows, min, max, width, height, pad);
       drawAxisLabels(ctx, [[max.toFixed(0), 18], [((max + min) / 2).toFixed(0), height / 2], [min.toFixed(0), height - 10]], width, height, pad);
       drawCursor(ctx, rows, min, max, width, height, pad);
       positionDecisionOverlay(rows, min, max, width, height, pad);
